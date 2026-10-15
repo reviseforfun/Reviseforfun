@@ -4,245 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReviseForFun - Make Studying Actually Fun 🎮</title>
-    <meta name="description" content="ReviseForFun - The ultimate free revision tool. Create flashcards, take quizzes, track your progress, and make studying actually enjoyable!">
+    <meta name="description" content="ReviseForFun - The ultimate free revision tool. 700+ ready-made flashcards, spaced repetition, quizzes, games, notes and cloud sync.">
+    <meta name="theme-color" content="#6c5ce7">
+    <link rel="manifest" href="manifest.webmanifest">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
-    
-    <style>
-        /* ==========================================
-           REVISEFORFUN - ALL-IN-ONE STYLES
-           ========================================== */
-        :root {
-            --bg-primary: #f8f9fc;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f0f2f7;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f8f9fc;
-            --bg-input: #f0f2f7;
-            --bg-nav: rgba(255, 255, 255, 0.85);
-
-            --text-primary: #1a1d2e;
-            --text-secondary: #5a5f7a;
-            --text-tertiary: #8b90a7;
-            --text-inverse: #ffffff;
-
-            --accent-primary: #6c5ce7;
-            --accent-primary-hover: #5a4bd4;
-            --accent-primary-light: rgba(108, 92, 231, 0.1);
-            --accent-secondary: #00cec9;
-            --accent-gradient: linear-gradient(135deg, #6c5ce7, #a29bfe, #00cec9);
-
-            --success: #00b894;
-            --success-light: rgba(0, 184, 148, 0.1);
-            --warning: #fdcb6e;
-            --warning-light: rgba(253, 203, 110, 0.1);
-            --danger: #e17055;
-            --danger-light: rgba(225, 112, 85, 0.1);
-            --info: #74b9ff;
-
-            --border: #e8ecf3;
-            --border-light: #f0f2f7;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
-            --shadow-xl: 0 20px 60px rgba(0,0,0,0.12);
-
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-            --radius-full: 9999px;
-
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --font-display: 'Space Grotesk', 'Inter', sans-serif;
-
-            --nav-height: 72px;
-            --transition: 0.2s ease;
-            --transition-slow: 0.4s ease;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #0f1117;
-            --bg-secondary: #1a1d2e;
-            --bg-tertiary: #232640;
-            --bg-card: #1a1d2e;
-            --bg-card-hover: #232640;
-            --bg-input: #232640;
-            --bg-nav: rgba(15, 17, 23, 0.9);
-
-            --text-primary: #e8ecf3;
-            --text-secondary: #a0a5be;
-            --text-tertiary: #6b7094;
-
-            --border: #2a2e45;
-            --border-light: #232640;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
-            --shadow-lg: 0 8px 30px rgba(0,0,0,0.35);
-            --shadow-xl: 0 20px 60px rgba(0,0,0,0.4);
-        }
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-        body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background var(--transition-slow), color var(--transition-slow);
-        }
-
-        a { color: var(--accent-primary); text-decoration: none; transition: color var(--transition); }
-        a:hover { color: var(--accent-primary-hover); }
-
-        .bg-animation {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden;
-        }
-        .bg-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: float 20s ease-in-out infinite; }
-        [data-theme="dark"] .bg-orb { opacity: 0.08; }
-        .bg-orb-1 { width: 600px; height: 600px; background: var(--accent-primary); top: -200px; right: -200px; }
-        .bg-orb-2 { width: 400px; height: 400px; background: var(--accent-secondary); bottom: -100px; left: -100px; animation-delay: -7s; }
-        .bg-orb-3 { width: 300px; height: 300px; background: #fd79a8; top: 50%; left: 50%; animation-delay: -14s; }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(30px, -50px) rotate(5deg); }
-            50% { transform: translate(-20px, 20px) rotate(-5deg); }
-            75% { transform: translate(50px, 30px) rotate(3deg); }
-        }
-
-        .loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary);
-            z-index: 10000; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        .loading-screen.hidden { opacity: 0; visibility: hidden; }
-        .loader { text-align: center; }
-        .loader-icon { font-size: 64px; animation: bounce 1s ease infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        .loader-bar { width: 200px; height: 4px; background: var(--bg-tertiary); border-radius: 4px; margin: 20px auto; overflow: hidden; }
-        .loader-fill { width: 0%; height: 100%; background: var(--accent-gradient); border-radius: 4px; animation: loadFill 1.5s ease forwards; }
-        @keyframes loadFill { to { width: 100%; } }
-
-        .navbar {
-            position: fixed; top: 0; left: 0; right: 0; height: var(--nav-height); background: var(--bg-nav);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 1000;
-        }
-        .nav-container { max-width: 1280px; margin: 0 auto; padding: 0 24px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
-        .nav-logo { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text-primary); }
-        .logo-highlight { color: var(--accent-primary); }
-        .nav-links { display: flex; align-items: center; gap: 4px; }
-        .nav-link { padding: 8px 16px; border-radius: var(--radius-sm); color: var(--text-secondary); font-weight: 500; font-size: 14px; }
-        .nav-link:hover { color: var(--text-primary); background: var(--bg-tertiary); }
-        .nav-link.active { color: var(--accent-primary); background: var(--accent-primary-light); }
-        .nav-actions { display: flex; align-items: center; gap: 12px; }
-        .theme-toggle { width: 40px; height: 40px; border-radius: var(--radius-full); border: 1px solid var(--border); background: var(--bg-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .streak-badge { display: flex; align-items: center; gap: 4px; padding: 6px 14px; background: var(--warning-light); border-radius: var(--radius-full); font-weight: 600; font-size: 14px; color: #e17055; }
-        .mobile-menu-btn { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; }
-        .mobile-menu-btn span { width: 24px; height: 2px; background: var(--text-primary); border-radius: 2px; }
-
-        .main-content { padding-top: var(--nav-height); position: relative; z-index: 1; min-height: 100vh; }
-        .page { display: none; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .hero { max-width: 1280px; margin: 0 auto; padding: 80px 24px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .hero-badge { display: inline-block; padding: 8px 20px; background: var(--accent-primary-light); color: var(--accent-primary); border-radius: var(--radius-full); font-size: 14px; font-weight: 600; margin-bottom: 24px; }
-        .hero-title { font-family: var(--font-display); font-size: clamp(36px, 5vw, 64px); font-weight: 800; line-height: 1.1; margin-bottom: 20px; }
-        .gradient-text { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero-subtitle { font-size: 18px; color: var(--text-secondary); margin-bottom: 36px; max-width: 520px; }
-        .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
-        .hero-stats { display: flex; gap: 40px; }
-        .hero-stat-number { font-family: var(--font-display); font-size: 28px; font-weight: 700; }
-        .hero-stat-label { font-size: 13px; color: var(--text-tertiary); }
-
-        .floating-cards { position: relative; width: 400px; height: 400px; margin: 0 auto; }
-        .floating-card { position: absolute; padding: 16px 28px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); font-weight: 600; animation: floatCard 6s ease-in-out infinite; }
-        .fc-1 { top: 10%; left: 5%; } .fc-2 { top: 5%; right: 10%; animation-delay: -1s; } .fc-3 { top: 40%; left: 15%; animation-delay: -2s; }
-        .fc-4 { top: 35%; right: 5%; animation-delay: -3s; } .fc-5 { bottom: 15%; left: 10%; animation-delay: -4s; } .fc-6 { bottom: 20%; right: 15%; animation-delay: -5s; }
-        @keyframes floatCard { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
-
-        .features-section, .how-it-works { max-width: 1280px; margin: 0 auto; padding: 80px 24px; }
-        .section-title { font-family: var(--font-display); font-size: clamp(28px, 3vw, 40px); font-weight: 700; text-align: center; margin-bottom: 48px; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-        .feature-card { padding: 32px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: var(--transition); cursor: pointer; }
-        .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent-primary); }
-        .feature-icon { font-size: 40px; margin-bottom: 16px; }
-
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px; border: none; cursor: pointer; transition: var(--transition); }
-        .btn-primary { background: var(--accent-primary); color: white; }
-        .btn-primary:hover { background: var(--accent-primary-hover); }
-        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-ghost { background: transparent; color: var(--text-secondary); }
-        .btn-lg { padding: 14px 28px; font-size: 16px; border-radius: var(--radius-md); }
-        .btn-sm { padding: 6px 14px; font-size: 12px; }
-        .btn-block { width: 100%; }
-
-        .text-input, .select-input, .textarea-input { width: 100%; padding: 12px 16px; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); outline: none; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
-
-        .page-header { max-width: 1280px; margin: 0 auto; padding: 40px 24px 24px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-        .page-header h1 { font-family: var(--font-display); font-size: 32px; font-weight: 700; }
-
-        .flashcard-grid { max-width: 1280px; margin: 0 auto; padding: 0 24px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-        .card-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; position: relative; }
-        .card-item-subject { display: inline-block; padding: 3px 10px; background: var(--accent-primary-light); color: var(--accent-primary); border-radius: var(--radius-full); font-size: 11px; font-weight: 600; margin-bottom: 12px; }
-        .card-item-question { font-weight: 600; margin-bottom: 8px; }
-        .card-item-answer { color: var(--text-secondary); font-size: 13px; }
-
-        .flashcard-container { perspective: 1000px; cursor: pointer; margin-bottom: 24px; }
-        .flashcard { width: 100%; min-height: 280px; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
-        .flashcard.flipped { transform: rotateY(180deg); }
-        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; gap: 16px; }
-        .flashcard-front { background: var(--bg-card); border: 2px solid var(--border); }
-        .flashcard-back { background: var(--accent-primary); color: white; transform: rotateY(180deg); }
-
-        .quiz-setup { max-width: 500px; margin: 0 auto; padding: 20px 24px 40px; }
-        .quiz-setup-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 40px; }
-        .quiz-active { max-width: 700px; margin: 0 auto; padding: 20px 24px 40px; }
-        .quiz-option { width: 100%; padding: 16px 20px; background: var(--bg-input); border: 2px solid var(--border); border-radius: var(--radius-md); cursor: pointer; font-size: 15px; margin-bottom: 10px; text-align: left; color: var(--text-primary); }
-        .quiz-option:hover { border-color: var(--accent-primary); }
-        .quiz-option.correct { border-color: var(--success); background: var(--success-light); }
-        .quiz-option.incorrect { border-color: var(--danger); background: var(--danger-light); }
-
-        .notes-layout { max-width: 1280px; margin: 0 auto; padding: 0 24px 40px; display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
-        .notes-sidebar { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
-        .notes-editor { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column; min-height: 500px; }
-        .note-title-input { padding: 16px; border: none; background: transparent; font-size: 20px; font-weight: 700; color: var(--text-primary); outline: none; }
-        .note-content-textarea { flex: 1; padding: 20px; border: none; background: transparent; color: var(--text-primary); font-family: monospace; font-size: 14px; outline: none; resize: none; }
-
-        .pomodoro-container { max-width: 900px; margin: 0 auto; padding: 20px 24px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        .pomodoro-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 40px; text-align: center; }
-        .pomodoro-time { font-family: var(--font-display); font-size: 48px; font-weight: 700; margin: 20px 0; }
-
-        .stats-grid { max-width: 1280px; margin: 0 auto; padding: 0 24px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
-        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; display: flex; align-items: center; gap: 16px; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 24px; }
-        .modal-overlay.active { display: flex; }
-        .modal { background: var(--bg-card); border-radius: var(--radius-lg); width: 100%; max-width: 500px; padding: 24px; }
-
-        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 3000; display: flex; flex-direction: column; gap: 8px; }
-        .toast { padding: 14px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); font-size: 14px; }
-
-        .footer { border-top: 1px solid var(--border); padding: 40px 24px; text-align: center; margin-top: 60px; color: var(--text-secondary); }
-
-        @media (max-width: 768px) {
-            .hero { grid-template-columns: 1fr; text-align: center; }
-            .hero-buttons, .hero-stats { justify-content: center; }
-            .notes-layout, .pomodoro-container { grid-template-columns: 1fr; }
-            .nav-links { display: none; }
-            .mobile-menu-btn { display: flex; }
-        }
-    </style>
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/features.css">
 </head>
 <body>
-    <div class="bg-animation">
+    <div class="bg-animation" aria-hidden="true">
         <div class="bg-orb bg-orb-1"></div>
         <div class="bg-orb bg-orb-2"></div>
         <div class="bg-orb bg-orb-3"></div>
@@ -256,46 +28,54 @@
         </div>
     </div>
 
+    <a class="skip-link" href="#main">Skip to content</a>
+
     <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <a href="#" class="nav-logo" onclick="showPage('home')">
+            <a href="#home" class="nav-logo">
                 <span class="logo-icon">📚</span>
                 <span class="logo-text">Revise<span class="logo-highlight">ForFun</span></span>
             </a>
             <div class="nav-links" id="nav-links">
-                <a href="#" class="nav-link active" data-page="home" onclick="showPage('home')">Home</a>
-                <a href="#" class="nav-link" data-page="flashcards" onclick="showPage('flashcards')">Flashcards</a>
-                <a href="#" class="nav-link" data-page="quiz" onclick="showPage('quiz')">Quiz</a>
-                <a href="#" class="nav-link" data-page="notes" onclick="showPage('notes')">Notes</a>
-                <a href="#" class="nav-link" data-page="pomodoro" onclick="showPage('pomodoro')">Timer</a>
-                <a href="#" class="nav-link" data-page="stats" onclick="showPage('stats')">Stats</a>
+                <a href="#home" class="nav-link active" data-page="home">Home</a>
+                <a href="#library" class="nav-link" data-page="library">Library</a>
+                <a href="#flashcards" class="nav-link" data-page="flashcards">Cards <span class="nav-badge" id="nav-due" hidden>0</span></a>
+                <a href="#quiz" class="nav-link" data-page="quiz">Quiz</a>
+                <a href="#games" class="nav-link" data-page="games">Games</a>
+                <a href="#notes" class="nav-link" data-page="notes">Notes</a>
+                <a href="#pomodoro" class="nav-link" data-page="pomodoro">Timer</a>
+                <a href="#stats" class="nav-link" data-page="stats">Stats</a>
+                <a href="#community" class="nav-link" data-page="community">Community</a>
             </div>
             <div class="nav-actions">
-                <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                <a href="#community" class="level-pill" id="level-pill" title="Your level">Lv <span id="nav-level">1</span></a>
+                <button class="theme-toggle" id="theme-toggle" data-action="toggle-theme" title="Toggle theme" aria-label="Toggle dark mode">
                     <span class="theme-icon">🌙</span>
                 </button>
                 <div class="streak-badge" id="streak-badge" title="Daily streak">
                     🔥 <span id="streak-count">0</span>
                 </div>
+                <button class="mobile-menu-btn" data-action="toggle-menu" aria-label="Menu"><span></span><span></span><span></span></button>
             </div>
         </div>
     </nav>
 
-    <main class="main-content">
-        <!-- HOME PAGE -->
+    <main class="main-content" id="main">
+        <!-- ==================== HOME ==================== -->
         <section id="page-home" class="page active">
             <div class="hero">
                 <div class="hero-content">
                     <div class="hero-badge">✨ Free Forever • No Sign Up Required</div>
                     <h1 class="hero-title">Make Revision <span class="gradient-text">Actually Fun</span></h1>
-                    <p class="hero-subtitle">Create flashcards, take quizzes, write notes, and track your progress — all in one beautiful place.</p>
+                    <p class="hero-subtitle">700+ ready-made flashcards, smart spaced repetition, quizzes, games and notes — all in one beautiful place.</p>
                     <div class="hero-buttons">
-                        <button class="btn btn-primary btn-lg" onclick="showPage('flashcards')">🎴 Start Flashcards</button>
-                        <button class="btn btn-secondary btn-lg" onclick="showPage('quiz')">🧠 Take Quiz</button>
+                        <button class="btn btn-primary btn-lg" data-action="study-due-home">🎴 Start Studying</button>
+                        <button class="btn btn-secondary btn-lg" data-action="goto" data-arg="library">📦 Browse Decks</button>
                     </div>
                     <div class="hero-stats">
-                        <div class="hero-stat"><span class="hero-stat-number" id="total-cards-stat">0</span><br><span class="hero-stat-label">Cards Created</span></div>
+                        <div class="hero-stat"><span class="hero-stat-number" id="total-cards-stat">0</span><br><span class="hero-stat-label">Cards</span></div>
                         <div class="hero-stat"><span class="hero-stat-number" id="total-quizzes-stat">0</span><br><span class="hero-stat-label">Quizzes Taken</span></div>
+                        <div class="hero-stat"><span class="hero-stat-number" id="total-time-stat">0m</span><br><span class="hero-stat-label">Study Time</span></div>
                     </div>
                 </div>
                 <div class="hero-visual">
@@ -304,216 +84,475 @@
                         <div class="floating-card fc-2">🔢 Maths</div>
                         <div class="floating-card fc-3">⚗️ Chemistry</div>
                         <div class="floating-card fc-4">📖 English</div>
+                        <div class="floating-card fc-5">🌋 Geography</div>
+                        <div class="floating-card fc-6">🏰 History</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard" id="dashboard"></div>
+
+            <div class="features-section">
+                <h2 class="section-title">Popular Decks</h2>
+                <div class="deck-grid" id="home-decks"></div>
+                <div class="center-row"><button class="btn btn-secondary" data-action="goto" data-arg="library">See all decks →</button></div>
+            </div>
+
+            <div class="features-section">
+                <h2 class="section-title">Everything you need to revise</h2>
+                <div class="features-grid">
+                    <div class="feature-card" data-action="goto" data-arg="library"><div class="feature-icon">📦</div><h3>Deck Library</h3><p>31 curated decks across Biology, Chemistry, Physics, Maths, English, History, Geography, languages and more.</p></div>
+                    <div class="feature-card" data-action="goto" data-arg="flashcards"><div class="feature-icon">🧠</div><h3>Spaced Repetition</h3><p>Rate each card Again / Hard / Good / Easy and we schedule the next review right before you'd forget.</p></div>
+                    <div class="feature-card" data-action="goto" data-arg="quiz"><div class="feature-icon">✅</div><h3>Smart Quizzes</h3><p>Multiple choice or type-your-answer quizzes with timers and a review of every mistake.</p></div>
+                    <div class="feature-card" data-action="goto" data-arg="games"><div class="feature-icon">🎮</div><h3>Games</h3><p>Match Pairs and the 60-second Speed Round turn recall into a competition with yourself.</p></div>
+                    <div class="feature-card" data-action="goto" data-arg="notes"><div class="feature-icon">📝</div><h3>Notes → Cards</h3><p>Write notes with Markdown, then turn any <code>question :: answer</code> line into a flashcard.</p></div>
+                    <div class="feature-card" data-action="goto" data-arg="community"><div class="feature-icon">☁️</div><h3>Sync &amp; Share</h3><p>Optional free account to sync across devices, share decks with a code, and climb the leaderboard.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LIBRARY ==================== -->
+        <section id="page-library" class="page">
+            <div class="page-header">
+                <div><h1>📦 Deck Library</h1><p>Ready-made flashcard sets – add them with one click</p></div>
+                <div class="page-header-actions">
+                    <button class="btn btn-secondary" data-action="open-code-modal">🔗 Import by code</button>
+                </div>
+            </div>
+            <div class="cards-toolbar">
+                <div class="toolbar-group">
+                    <input type="search" id="library-search" class="text-input toolbar-search" placeholder="Search decks and cards…" data-input="render-library" aria-label="Search library">
+                    <select id="library-subject" class="select-input select-small" data-input="render-library" aria-label="Subject"></select>
+                </div>
+                <span class="cards-count" id="library-count"></span>
+            </div>
+            <div class="deck-grid deck-grid-page" id="library-grid"></div>
+        </section>
+
+        <!-- ==================== FLASHCARDS ==================== -->
+        <section id="page-flashcards" class="page">
+            <div id="flashcard-grid-area">
+                <div class="page-header">
+                    <div><h1>🎴 Flashcards</h1><p>Create, organise and study your cards</p></div>
+                    <div class="page-header-actions">
+                        <button class="btn btn-secondary" data-action="open-bulk-modal" title="Add many cards at once">➕ Bulk add</button>
+                        <button class="btn btn-secondary" data-action="open-import-modal" title="Import from CSV">⬆️ Import</button>
+                        <button class="btn btn-secondary" data-action="export-cards" title="Export to CSV">⬇️ Export</button>
+                        <button class="btn btn-secondary" data-action="open-share-modal" title="Share a deck with a code">🔗 Share</button>
+                        <button class="btn btn-primary" data-action="new-card">+ New Card</button>
+                    </div>
+                </div>
+                <div class="due-banner" id="due-banner"></div>
+                <div class="cards-toolbar">
+                    <div class="toolbar-group">
+                        <input type="search" id="card-search" class="text-input toolbar-search" placeholder="Search cards…" data-input="render-cards" aria-label="Search cards">
+                        <select id="flashcard-subject-filter" class="select-input select-small" data-input="render-cards" aria-label="Subject filter"><option value="all">All Subjects</option></select>
+                        <select id="card-status-filter" class="select-input select-small" data-input="render-cards" aria-label="Status filter">
+                            <option value="all">All cards</option>
+                            <option value="due">Due now</option>
+                            <option value="new">New</option>
+                            <option value="learning">Learning</option>
+                            <option value="mastered">Mastered</option>
+                            <option value="starred">★ Starred</option>
+                        </select>
+                    </div>
+                    <div class="toolbar-group">
+                        <span class="cards-count" id="cards-count">0 cards</span>
+                        <button class="btn btn-success" id="study-due-btn" data-action="study-due">🎯 Study due</button>
+                        <button class="btn btn-primary" id="study-mode-btn" data-action="study-all">🔀 Study all</button>
+                    </div>
+                </div>
+                <div class="flashcard-grid" id="flashcard-grid"></div>
+            </div>
+
+            <div id="flashcard-study-area" class="flashcard-study-area" hidden>
+                <div class="study-topbar">
+                    <button class="btn btn-ghost btn-sm" data-action="exit-study">← Back</button>
+                    <span class="study-label" id="study-label"></span>
+                    <div class="study-tools">
+                        <button class="btn btn-ghost btn-sm" id="study-reverse" data-action="study-reverse" title="Show the answer first">🔁 Reverse</button>
+                        <button class="btn btn-ghost btn-sm" id="study-star" data-action="study-star" title="Star this card (S)">☆</button>
+                    </div>
+                </div>
+                <div class="study-progress">
+                    <div class="study-progress-bar"><div class="study-progress-fill" id="study-progress-fill"></div></div>
+                    <span id="study-progress-text">0 / 0</span>
+                </div>
+                <div class="flashcard-container" data-action="flip" role="button" tabindex="0" aria-label="Flip card">
+                    <div class="flashcard" id="study-flashcard">
+                        <div class="flashcard-front">
+                            <span class="flashcard-subject-tag" id="study-card-subject">General</span>
+                            <p id="study-card-front"></p>
+                            <span class="flashcard-hint">Click or press Space to flip</span>
+                        </div>
+                        <div class="flashcard-back">
+                            <p id="study-card-back"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="study-controls" id="study-flip-row">
+                    <button class="btn btn-primary btn-lg" data-action="flip">Show answer <kbd>Space</kbd></button>
+                </div>
+                <div class="study-controls rate-controls" id="study-rate-row" hidden>
+                    <button class="btn rate-btn rate-again" data-action="rate" data-arg="1"><span>Again</span><small id="rate-int-1"></small><kbd>1</kbd></button>
+                    <button class="btn rate-btn rate-hard" data-action="rate" data-arg="2"><span>Hard</span><small id="rate-int-2"></small><kbd>2</kbd></button>
+                    <button class="btn rate-btn rate-good" data-action="rate" data-arg="3"><span>Good</span><small id="rate-int-3"></small><kbd>3</kbd></button>
+                    <button class="btn rate-btn rate-easy" data-action="rate" data-arg="4"><span>Easy</span><small id="rate-int-4"></small><kbd>4</kbd></button>
+                </div>
+            </div>
+
+            <div id="flashcard-summary" class="quiz-results" hidden>
+                <div class="quiz-results-card">
+                    <div class="results-emoji" id="summary-emoji">🎉</div>
+                    <h2 id="summary-title">Session complete!</h2>
+                    <div class="summary-stats" id="summary-stats"></div>
+                    <div class="results-actions">
+                        <button class="btn btn-secondary" data-action="exit-study">Back to cards</button>
+                        <button class="btn btn-primary" data-action="goto" data-arg="quiz">Take a quiz</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- FLASHCARDS PAGE -->
-        <section id="page-flashcards" class="page">
-            <div class="page-header">
-                <div><h1>🎴 Flashcards</h1><p>Create and study your cards</p></div>
-                <button class="btn btn-primary" onclick="openCreateCardModal()">+ New Card</button>
-            </div>
-            <div class="flashcard-grid" id="flashcard-grid"></div>
-        </section>
-
-        <!-- QUIZ PAGE -->
+        <!-- ==================== QUIZ ==================== -->
         <section id="page-quiz" class="page">
-            <div class="page-header"><div><h1>🧠 Quiz Mode</h1><p>Test your memory</p></div></div>
+            <div class="page-header"><div><h1>🧠 Quiz Mode</h1><p>Test your memory with questions generated from your cards</p></div></div>
             <div id="quiz-setup" class="quiz-setup">
                 <div class="quiz-setup-card">
                     <h2>Start a Quiz</h2>
-                    <p style="margin-bottom:20px; color:var(--text-secondary);">Generates questions automatically from your flashcards!</p>
-                    <button class="btn btn-primary btn-lg btn-block" onclick="startQuiz()">🚀 Start Quiz</button>
+                    <div class="form-group">
+                        <label for="quiz-subject">Subject</label>
+                        <select id="quiz-subject" class="select-input"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quiz-mode">Question type</label>
+                        <select id="quiz-mode" class="select-input">
+                            <option value="choice">Multiple choice</option>
+                            <option value="typed">Type the answer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quiz-count">Number of questions</label>
+                        <select id="quiz-count" class="select-input">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quiz-time">Time per question</label>
+                        <select id="quiz-time" class="select-input">
+                            <option value="0">No timer</option>
+                            <option value="15">15 seconds</option>
+                            <option value="30" selected>30 seconds</option>
+                            <option value="60">60 seconds</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-lg btn-block" id="start-quiz-btn" data-action="start-quiz">🚀 Start Quiz</button>
+                    <p class="quiz-requirement" id="quiz-requirement" hidden>Multiple choice needs at least 4 flashcards in total. <a href="#library">Add a deck →</a></p>
                 </div>
             </div>
-            <div id="quiz-active" class="quiz-active" style="display:none;">
-                <h2 id="quiz-question-text" style="margin-bottom:20px;">Question?</h2>
-                <div class="quiz-options" id="quiz-options"></div>
+            <div id="quiz-active" class="quiz-active" hidden>
+                <div class="quiz-header">
+                    <div class="quiz-progress">Question <span id="quiz-question-num">1</span> of <span id="quiz-total-num">10</span></div>
+                    <div class="quiz-timer" id="quiz-timer"><span id="quiz-timer-text">30s</span><div class="quiz-timer-bar"><div class="quiz-timer-fill" id="quiz-timer-fill"></div></div></div>
+                    <div class="quiz-score">Score: <span id="quiz-current-score">0</span></div>
+                </div>
+                <div class="quiz-question-card">
+                    <h2 id="quiz-question-text">Question?</h2>
+                    <div class="quiz-options" id="quiz-options"></div>
+                    <form class="quiz-typed" id="quiz-typed" hidden autocomplete="off">
+                        <input type="text" id="quiz-typed-input" class="text-input" placeholder="Type your answer…" aria-label="Your answer">
+                        <button class="btn btn-primary" type="submit" id="quiz-typed-submit">Check</button>
+                    </form>
+                    <div class="quiz-feedback" id="quiz-feedback" hidden></div>
+                    <div class="quiz-next" id="quiz-next" hidden><button class="btn btn-primary" data-action="quiz-next">Next →</button></div>
+                </div>
+            </div>
+            <div id="quiz-results" class="quiz-results" hidden>
+                <div class="quiz-results-card">
+                    <div class="results-emoji" id="results-emoji">🏆</div>
+                    <h2 id="results-title">Perfect Score!</h2>
+                    <div class="results-score"><span class="results-score-number" id="results-score">0</span><span class="results-score-total">/<span id="results-total">0</span></span></div>
+                    <div class="results-percentage" id="results-percentage">0%</div>
+                    <p class="xp-earned" id="results-xp"></p>
+                    <div class="results-review" id="results-review"></div>
+                    <div class="results-actions">
+                        <button class="btn btn-secondary" data-action="reset-quiz">New Quiz</button>
+                        <button class="btn btn-primary" data-action="retake-quiz">Try Again</button>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- NOTES PAGE -->
+        <!-- ==================== GAMES ==================== -->
+        <section id="page-games" class="page">
+            <div id="games-hub">
+                <div class="page-header"><div><h1>🎮 Games</h1><p>Learn without it feeling like learning</p></div></div>
+                <div class="games-setup">
+                    <div class="game-card">
+                        <div class="game-icon">🧩</div>
+                        <h3>Match Pairs</h3>
+                        <p>Flip tiles to match each question with its answer. Fewer moves and a faster time is better!</p>
+                        <div class="form-group"><label for="match-subject">Subject</label><select id="match-subject" class="select-input"></select></div>
+                        <button class="btn btn-primary btn-block" data-action="start-match">Play Match</button>
+                    </div>
+                    <div class="game-card">
+                        <div class="game-icon">⚡</div>
+                        <h3>Speed Round</h3>
+                        <p>True or false? 60 seconds on the clock – build a streak for bonus points.</p>
+                        <div class="form-group"><label for="speed-subject">Subject</label><select id="speed-subject" class="select-input"></select></div>
+                        <button class="btn btn-primary btn-block" data-action="start-speed">Play Speed Round</button>
+                    </div>
+                </div>
+                <p class="quiz-requirement" id="games-requirement" hidden>You need at least 4 flashcards to play. <a href="#library">Add a deck →</a></p>
+            </div>
+
+            <div id="match-area" class="game-area" hidden>
+                <div class="game-bar">
+                    <button class="btn btn-ghost btn-sm" data-action="exit-game">← Back</button>
+                    <span>Moves: <strong id="match-moves">0</strong></span>
+                    <span>Time: <strong id="match-time">0s</strong></span>
+                    <span>Pairs: <strong id="match-pairs">0/6</strong></span>
+                </div>
+                <div class="match-grid" id="match-grid"></div>
+            </div>
+
+            <div id="speed-area" class="game-area game-area-narrow" hidden>
+                <div class="game-bar">
+                    <button class="btn btn-ghost btn-sm" data-action="exit-game">← Back</button>
+                    <span>Score: <strong id="speed-score">0</strong></span>
+                    <span>Streak: <strong id="speed-streak">0</strong> 🔥</span>
+                    <span>Time: <strong id="speed-time">60</strong>s</span>
+                </div>
+                <div class="speed-timer"><div class="speed-timer-fill" id="speed-timer-fill"></div></div>
+                <div class="speed-card" id="speed-card">
+                    <div class="speed-q" id="speed-q"></div>
+                    <div class="speed-a" id="speed-a"></div>
+                </div>
+                <div class="study-controls">
+                    <button class="btn btn-danger btn-lg" data-action="speed-answer" data-arg="false">✖ False <kbd>←</kbd></button>
+                    <button class="btn btn-success btn-lg" data-action="speed-answer" data-arg="true">✔ True <kbd>→</kbd></button>
+                </div>
+            </div>
+
+            <div id="game-over" class="quiz-results" hidden>
+                <div class="quiz-results-card">
+                    <div class="results-emoji" id="game-over-emoji">🏁</div>
+                    <h2 id="game-over-title">Game over</h2>
+                    <div class="summary-stats" id="game-over-stats"></div>
+                    <div class="results-actions">
+                        <button class="btn btn-secondary" data-action="exit-game">Back to games</button>
+                        <button class="btn btn-primary" data-action="play-again">Play again</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== NOTES ==================== -->
         <section id="page-notes" class="page">
-            <div class="page-header"><div><h1>📝 Study Notes</h1></div><button class="btn btn-primary" onclick="createNewNote()">+ New Note</button></div>
+            <div class="page-header"><div><h1>📝 Study Notes</h1><p>Markdown supported. Write <code>question :: answer</code> on a line to turn it into a flashcard.</p></div><button class="btn btn-primary" data-action="new-note">+ New Note</button></div>
             <div class="notes-layout">
-                <div class="notes-sidebar" id="notes-list"></div>
-                <div class="notes-editor">
-                    <input type="text" id="note-title-input" class="note-title-input" placeholder="Note Title..." oninput="saveCurrentNote()">
-                    <textarea id="note-content" class="note-content-textarea" placeholder="Start typing your notes here..." oninput="saveCurrentNote()"></textarea>
+                <div class="notes-sidebar">
+                    <div class="notes-search"><input type="search" id="notes-search" placeholder="Search notes…" data-input="render-notes" aria-label="Search notes"></div>
+                    <div class="notes-list" id="notes-list"></div>
+                </div>
+                <div class="notes-editor" id="notes-editor">
+                    <div class="notes-editor-empty" id="notes-editor-empty">
+                        <div class="empty-icon">📝</div>
+                        <h3>Select or create a note</h3>
+                        <p>Your notes are saved automatically.</p>
+                        <button class="btn btn-primary" data-action="new-note">+ New Note</button>
+                    </div>
+                    <div id="note-editor-content" class="note-editor-content" hidden>
+                        <div class="note-editor-header">
+                            <input type="text" id="note-title-input" class="note-title-input" placeholder="Note title…" data-input="save-note" aria-label="Note title">
+                            <input type="text" id="note-subject-input" class="text-input note-subject-input" placeholder="Subject" list="subject-suggestions" data-input="save-note" aria-label="Note subject">
+                            <button class="btn btn-secondary btn-sm" id="note-preview-btn" data-action="toggle-note-preview">👁 Preview</button>
+                            <button class="btn btn-secondary btn-sm" data-action="note-to-cards" title="Create flashcards from 'question :: answer' lines">🎴 Make cards</button>
+                            <button class="btn btn-danger btn-sm" data-action="delete-note">🗑️</button>
+                        </div>
+                        <textarea id="note-content" class="note-content-textarea" placeholder="Start typing your notes here…&#10;&#10;# Heading&#10;**bold**, *italic*, - lists&#10;What is the powerhouse of the cell? :: Mitochondria" data-input="save-note" aria-label="Note content"></textarea>
+                        <div id="note-preview" class="note-preview markdown" hidden></div>
+                        <div class="note-footer"><span id="note-word-count">0 words</span><span id="note-saved">Saved</span></div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- POMODORO PAGE -->
+        <!-- ==================== POMODORO ==================== -->
         <section id="page-pomodoro" class="page">
-            <div class="page-header"><div><h1>⏱️ Pomodoro Timer</h1></div></div>
+            <div class="page-header"><div><h1>⏱️ Pomodoro Timer</h1><p>Focus in short bursts, rest in between</p></div></div>
             <div class="pomodoro-container">
                 <div class="pomodoro-card">
-                    <div class="pomodoro-time" id="pomo-time">25:00</div>
-                    <button class="btn btn-primary btn-lg" id="pomo-btn" onclick="togglePomodoro()">▶️ Start</button>
+                    <div class="pomodoro-tabs">
+                        <button class="pomodoro-tab active" id="pomo-tab-work" data-action="pomo-mode" data-arg="work">Focus</button>
+                        <button class="pomodoro-tab" id="pomo-tab-short" data-action="pomo-mode" data-arg="short">Short Break</button>
+                        <button class="pomodoro-tab" id="pomo-tab-long" data-action="pomo-mode" data-arg="long">Long Break</button>
+                    </div>
+                    <div class="pomodoro-timer">
+                        <svg class="pomodoro-circle" viewBox="0 0 200 200" aria-hidden="true">
+                            <circle class="pomodoro-circle-bg" cx="100" cy="100" r="90"></circle>
+                            <circle class="pomodoro-circle-fill" id="pomo-circle" cx="100" cy="100" r="90"></circle>
+                        </svg>
+                        <div class="pomodoro-time" id="pomo-time" role="timer">25:00</div>
+                    </div>
+                    <div class="pomodoro-controls">
+                        <button class="btn btn-primary btn-lg" id="pomo-btn" data-action="pomo-toggle">▶️ Start</button>
+                        <button class="btn btn-secondary btn-lg" data-action="pomo-reset">🔄 Reset</button>
+                    </div>
+                    <div class="pomodoro-sessions">Sessions completed: <strong id="pomo-sessions">0</strong><div class="session-dots" id="session-dots"></div></div>
+                </div>
+                <div class="pomodoro-settings-card">
+                    <h3>⚙️ Settings</h3>
+                    <div class="form-group"><label for="pomo-work-duration">Focus (minutes)</label><input type="number" id="pomo-work-duration" class="text-input" min="1" max="180" value="25" data-input="pomo-settings"></div>
+                    <div class="form-group"><label for="pomo-short-duration">Short break (minutes)</label><input type="number" id="pomo-short-duration" class="text-input" min="1" max="60" value="5" data-input="pomo-settings"></div>
+                    <div class="form-group"><label for="pomo-long-duration">Long break (minutes)</label><input type="number" id="pomo-long-duration" class="text-input" min="1" max="120" value="15" data-input="pomo-settings"></div>
+                    <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="pomo-auto-start" checked data-input="pomo-settings"> Auto-start next session</label></div>
+                    <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="pomo-sound" checked data-input="pomo-settings"> Play sound when done</label></div>
                 </div>
             </div>
         </section>
 
-        <!-- STATS PAGE -->
+        <!-- ==================== STATS ==================== -->
         <section id="page-stats" class="page">
-            <div class="page-header"><div><h1>📊 Your Progress</h1></div></div>
+            <div class="page-header"><div><h1>📊 Your Progress</h1><p>Track your streaks, mastery and achievements</p></div></div>
+            <div class="level-card" id="level-card"></div>
             <div class="stats-grid">
-                <div class="stat-card"><h3>🔥 Streak: <span id="stat-streak">0</span> days</h3></div>
-                <div class="stat-card"><h3>🎴 Cards: <span id="stat-cards">0</span></h3></div>
+                <div class="stat-card"><span class="stat-icon">🔥</span><div><div class="stat-number" id="stat-streak">0</div><div class="stat-label">Day Streak</div></div></div>
+                <div class="stat-card"><span class="stat-icon">👑</span><div><div class="stat-number" id="stat-best-streak">0</div><div class="stat-label">Best Streak</div></div></div>
+                <div class="stat-card"><span class="stat-icon">🎴</span><div><div class="stat-number" id="stat-cards">0</div><div class="stat-label">Flashcards</div></div></div>
+                <div class="stat-card"><span class="stat-icon">🎓</span><div><div class="stat-number" id="stat-mastered">0</div><div class="stat-label">Mastered</div></div></div>
+                <div class="stat-card"><span class="stat-icon">🔁</span><div><div class="stat-number" id="stat-reviews">0</div><div class="stat-label">Reviews</div></div></div>
+                <div class="stat-card"><span class="stat-icon">🧠</span><div><div class="stat-number" id="stat-quizzes">0</div><div class="stat-label">Quizzes</div></div></div>
+                <div class="stat-card"><span class="stat-icon">🎯</span><div><div class="stat-number" id="stat-avg-score">0%</div><div class="stat-label">Avg Quiz Score</div></div></div>
+                <div class="stat-card"><span class="stat-icon">📝</span><div><div class="stat-number" id="stat-notes">0</div><div class="stat-label">Notes</div></div></div>
+                <div class="stat-card"><span class="stat-icon">⏱️</span><div><div class="stat-number" id="stat-time">0m</div><div class="stat-label">Study Time</div></div></div>
+            </div>
+            <div class="stats-section"><h2>🧱 Card mastery</h2><div class="mastery" id="mastery"></div></div>
+            <div class="stats-section"><h2>📅 Activity (last 12 weeks)</h2>
+                <div class="heatmap-container"><div class="heatmap" id="heatmap"></div>
+                    <div class="heatmap-legend">Less <div class="heatmap-cell heatmap-0"></div><div class="heatmap-cell heatmap-1"></div><div class="heatmap-cell heatmap-2"></div><div class="heatmap-cell heatmap-3"></div><div class="heatmap-cell heatmap-4"></div> More</div>
+                </div>
+            </div>
+            <div class="stats-section"><h2>🏅 Achievements</h2><div class="achievements" id="achievements"></div></div>
+            <div class="stats-section"><h2>📚 Subjects</h2><div class="subject-bars" id="subject-bars"></div></div>
+            <div class="stats-section"><h2>🧠 Recent quizzes</h2><div class="quiz-history" id="quiz-history"></div></div>
+            <div class="stats-section"><h2>💾 Your data</h2>
+                <div class="data-actions">
+                    <button class="btn btn-secondary" data-action="backup-export">⬇️ Download backup</button>
+                    <button class="btn btn-secondary" data-action="backup-import">⬆️ Restore backup</button>
+                    <input type="file" id="backup-file" accept="application/json,.json" hidden>
+                    <label class="checkbox-label goal-label">Daily goal
+                        <input type="number" id="daily-goal" class="text-input goal-input" min="1" max="500" data-input="daily-goal"> cards
+                    </label>
+                    <button class="btn btn-danger" data-action="reset-all">🗑️ Reset all data</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== COMMUNITY / ACCOUNT ==================== -->
+        <section id="page-community" class="page">
+            <div class="page-header"><div><h1>☁️ Community</h1><p>Sync your progress, share decks and compete on the leaderboard</p></div>
+                <div class="server-status" id="server-status"></div></div>
+            <div class="community-layout">
+                <div class="community-card" id="account-card"></div>
+                <div class="community-card">
+                    <h3>🏆 Leaderboard</h3>
+                    <div id="leaderboard"></div>
+                </div>
+                <div class="community-card" id="shares-card"></div>
             </div>
         </section>
     </main>
 
-    <!-- MODAL -->
-    <div class="modal-overlay" id="card-modal">
-        <div class="modal">
-            <h2>Create Flashcard</h2>
-            <div class="form-group" style="margin-top:16px;">
-                <label>Question</label>
-                <input type="text" id="card-front" class="text-input" placeholder="Front side">
+    <!-- ==================== MODALS ==================== -->
+    <div class="modal-overlay" id="card-modal" data-modal>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="card-modal-title">
+            <div class="modal-header"><h2 id="card-modal-title">Create Flashcard</h2><button class="modal-close" data-action="close-modal" aria-label="Close">×</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label for="card-subject">Subject</label><input type="text" id="card-subject" class="text-input" list="subject-suggestions" placeholder="e.g. Biology"><datalist id="subject-suggestions"></datalist></div>
+                <div class="form-group"><label for="card-front">Question</label><textarea id="card-front" class="textarea-input" rows="3" placeholder="Front side"></textarea></div>
+                <div class="form-group"><label for="card-back">Answer</label><textarea id="card-back" class="textarea-input" rows="3" placeholder="Back side"></textarea></div>
             </div>
-            <div class="form-group">
-                <label>Answer</label>
-                <input type="text" id="card-back" class="text-input" placeholder="Back side">
-            </div>
-            <div style="display:flex; justify-content:flex-end; gap:8px;">
-                <button class="btn btn-secondary" onclick="closeCardModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveCard()">Save Card</button>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+                <button class="btn btn-primary" id="save-card-btn" data-action="save-card">Create Card</button>
             </div>
         </div>
     </div>
 
-    <div class="toast-container" id="toast-container"></div>
+    <div class="modal-overlay" id="bulk-modal" data-modal>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bulk-title">
+            <div class="modal-header"><h2 id="bulk-title">Bulk add cards</h2><button class="modal-close" data-action="close-modal" aria-label="Close">×</button></div>
+            <div class="modal-body">
+                <p class="modal-hint">One card per line, as <code>question :: answer</code></p>
+                <div class="form-group"><label for="bulk-subject">Subject</label><input type="text" id="bulk-subject" class="text-input" list="subject-suggestions" placeholder="General"></div>
+                <div class="form-group"><textarea id="bulk-text" class="textarea-input" rows="9" placeholder="Capital of France? :: Paris&#10;2 + 2 :: 4"></textarea></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" data-action="close-modal">Cancel</button><button class="btn btn-primary" data-action="save-bulk">Add cards</button></div>
+        </div>
+    </div>
 
-    <footer class="footer"><p>ReviseForFun • 100% Free & Open Source</p></footer>
+    <div class="modal-overlay" id="import-modal" data-modal>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="import-title">
+            <div class="modal-header"><h2 id="import-title">Import cards</h2><button class="modal-close" data-action="close-modal" aria-label="Close">×</button></div>
+            <div class="modal-body">
+                <p class="modal-hint">Upload or paste a CSV (or tab-separated) file with columns <code>front, back, subject</code>. Works with exports from this app and most flashcard tools.</p>
+                <div class="form-group"><input type="file" id="import-file" accept=".csv,.tsv,.txt,text/csv,text/plain"></div>
+                <div class="form-group"><label for="import-subject">Default subject</label><input type="text" id="import-subject" class="text-input" list="subject-suggestions" placeholder="General"></div>
+                <div class="form-group"><textarea id="import-text" class="textarea-input" rows="6" placeholder="front,back,subject"></textarea></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" data-action="close-modal">Cancel</button><button class="btn btn-primary" data-action="save-import">Import</button></div>
+        </div>
+    </div>
 
-    <script>
-        /* APP LOGIC */
-        const STORAGE_KEY = 'reviseforfun_data';
-        let appData = { flashcards: [], notes: [], streak: 1, theme: 'light' };
-        let currentNoteId = null;
-        let pomoTime = 1500, pomoTimer = null, pomoRunning = false;
+    <div class="modal-overlay" id="share-modal" data-modal>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="share-title">
+            <div class="modal-header"><h2 id="share-title">Share a deck</h2><button class="modal-close" data-action="close-modal" aria-label="Close">×</button></div>
+            <div class="modal-body" id="share-body"></div>
+            <div class="modal-footer" id="share-footer"></div>
+        </div>
+    </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-            setTimeout(() => document.getElementById('loading-screen').classList.add('hidden'), 1000);
-            renderFlashcards();
-            renderNotes();
-            updateStats();
-        });
+    <div class="modal-overlay" id="code-modal" data-modal>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="code-title">
+            <div class="modal-header"><h2 id="code-title">Import by code</h2><button class="modal-close" data-action="close-modal" aria-label="Close">×</button></div>
+            <div class="modal-body">
+                <p class="modal-hint">Got a share code from a friend or teacher? Enter it to add their deck.</p>
+                <div class="form-group"><input type="text" id="code-input" class="text-input code-input" maxlength="8" placeholder="ABCD2345" autocomplete="off"></div>
+                <div id="code-preview"></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" data-action="close-modal">Cancel</button><button class="btn btn-primary" data-action="lookup-code" id="code-btn">Find deck</button></div>
+        </div>
+    </div>
 
-        function loadData() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) appData = JSON.parse(saved);
-        }
-        function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
+    <div class="modal-overlay" id="deck-modal" data-modal>
+        <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="deck-modal-title">
+            <div class="modal-header"><h2 id="deck-modal-title">Deck</h2><button class="modal-close" data-action="close-modal" aria-label="Close">×</button></div>
+            <div class="modal-body" id="deck-modal-body"></div>
+            <div class="modal-footer" id="deck-modal-footer"></div>
+        </div>
+    </div>
 
-        function showPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(`page-${page}`).classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(a => a.classList.toggle('active', a.dataset.page === page));
-        }
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-        function toggleTheme() {
-            appData.theme = appData.theme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', appData.theme);
-            saveData();
-        }
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">📚 ReviseForFun</div>
+            <p>100% Free &amp; Open Source • Made with ❤️ for students everywhere</p>
+            <div class="footer-links"><span>Shortcuts:</span> <span><kbd>Space</kbd> flip</span> • <span><kbd>1-4</kbd> rate</span> • <span><kbd>S</kbd> star</span> • <span><kbd>Esc</kbd> close</span></div>
+        </div>
+    </footer>
 
-        /* Flashcards */
-        function renderFlashcards() {
-            const grid = document.getElementById('flashcard-grid');
-            grid.innerHTML = appData.flashcards.length === 0 ? '<p>No cards yet. Create one!</p>' : '';
-            appData.flashcards.forEach((card, i) => {
-                grid.innerHTML += `
-                    <div class="card-item">
-                        <div class="card-item-question">Q: ${card.front}</div>
-                        <div class="card-item-answer">A: ${card.back}</div>
-                    </div>`;
-            });
-            document.getElementById('total-cards-stat').textContent = appData.flashcards.length;
-        }
-
-        function openCreateCardModal() { document.getElementById('card-modal').classList.add('active'); }
-        function closeCardModal() { document.getElementById('card-modal').classList.remove('active'); }
-
-        function saveCard() {
-            const front = document.getElementById('card-front').value.trim();
-            const back = document.getElementById('card-back').value.trim();
-            if(!front || !back) return;
-            appData.flashcards.push({ front, back });
-            saveData();
-            renderFlashcards();
-            closeCardModal();
-            document.getElementById('card-front').value = '';
-            document.getElementById('card-back').value = '';
-        }
-
-        /* Quiz */
-        function startQuiz() {
-            if(appData.flashcards.length === 0) return alert('Create some flashcards first!');
-            document.getElementById('quiz-setup').style.display = 'none';
-            document.getElementById('quiz-active').style.display = 'block';
-            const card = appData.flashcards[0];
-            document.getElementById('quiz-question-text').textContent = card.front;
-            document.getElementById('quiz-options').innerHTML = `<button class="quiz-option" onclick="alert('Correct!')">${card.back}</button>`;
-        }
-
-        /* Notes */
-        function renderNotes() {
-            const list = document.getElementById('notes-list');
-            list.innerHTML = '';
-            appData.notes.forEach(note => {
-                list.innerHTML += `<div style="padding:12px; cursor:pointer;" onclick="openNote('${note.id}')">${note.title || 'Untitled'}</div>`;
-            });
-        }
-        function createNewNote() {
-            const note = { id: Date.now().toString(), title: '', content: '' };
-            appData.notes.push(note);
-            saveData();
-            openNote(note.id);
-            renderNotes();
-        }
-        function openNote(id) {
-            currentNoteId = id;
-            const note = appData.notes.find(n => n.id === id);
-            if(!note) return;
-            document.getElementById('note-title-input').value = note.title;
-            document.getElementById('note-content').value = note.content;
-        }
-        function saveCurrentNote() {
-            if(!currentNoteId) return;
-            const note = appData.notes.find(n => n.id === currentNoteId);
-            if(note) {
-                note.title = document.getElementById('note-title-input').value;
-                note.content = document.getElementById('note-content').value;
-                saveData();
-                renderNotes();
-            }
-        }
-
-        /* Pomodoro */
-        function togglePomodoro() {
-            if(pomoRunning) { clearInterval(pomoTimer); pomoRunning = false; document.getElementById('pomo-btn').textContent = '▶️ Start'; }
-            else {
-                pomoRunning = true;
-                document.getElementById('pomo-btn').textContent = '⏸️ Pause';
-                pomoTimer = setInterval(() => {
-                    pomoTime--;
-                    let m = Math.floor(pomoTime/60), s = pomoTime%60;
-                    document.getElementById('pomo-time').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-                    if(pomoTime <= 0) clearInterval(pomoTimer);
-                }, 1000);
-            }
-        }
-
-        function updateStats() {
-            document.getElementById('stat-streak').textContent = appData.streak;
-            document.getElementById('stat-cards').textContent = appData.flashcards.length;
-        }
-    </script>
+    <script src="js/core.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/play.js"></script>
+    <script src="js/tools.js"></script>
+    <script src="js/community.js"></script>
+    <script src="js/boot.js"></script>
 </body>
 </html>

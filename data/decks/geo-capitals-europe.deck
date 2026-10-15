@@ -1,0 +1,32 @@
+title: Capital Cities: Europe
+subject: Geography
+level: KS3
+emoji: 🇪🇺
+front-template: What is the capital of {}?
+description: Name the capital of each European country.
+---
+France :: Paris
+Germany :: Berlin
+Spain :: Madrid
+Italy :: Rome
+Portugal :: Lisbon
+Ireland :: Dublin
+Netherlands :: Amsterdam
+Belgium :: Brussels
+Switzerland :: Bern
+Austria :: Vienna
+Poland :: Warsaw
+Czech Republic :: Prague
+Hungary :: Budapest
+Greece :: Athens
+Sweden :: Stockholm
+Norway :: Oslo
+Denmark :: Copenhagen
+Finland :: Helsinki
+Iceland :: Reykjavík
+Romania :: Bucharest
+Bulgaria :: Sofia
+Croatia :: Zagreb
+Ukraine :: Kyiv
+Scotland :: Edinburgh
+Wales :: Cardiff

@@ -1,0 +1,30 @@
+title: Essential Maths Formulae
+subject: Maths
+level: GCSE
+emoji: 🧮
+description: Area, volume, Pythagoras, trig and the quadratic formula.
+---
+Area of a circle? :: A = πr²
+Circumference of a circle? :: C = 2πr (or πd)
+Area of a triangle? :: ½ × base × perpendicular height
+Area of a trapezium? :: ½ × (a + b) × h
+Area of a parallelogram? :: base × perpendicular height
+Volume of a cuboid? :: length × width × height
+Volume of a cylinder? :: V = πr²h
+Volume of a cone? :: V = ⅓πr²h
+Volume of a sphere? :: V = ⁴⁄₃πr³
+Surface area of a sphere? :: 4πr²
+Volume of a pyramid? :: ⅓ × base area × height
+Pythagoras' theorem? :: a² + b² = c², where c is the hypotenuse.
+SOHCAHTOA – what does SOH stand for? :: sin θ = opposite ÷ hypotenuse
+What does CAH stand for? :: cos θ = adjacent ÷ hypotenuse
+What does TOA stand for? :: tan θ = opposite ÷ adjacent
+Sine rule? :: a ÷ sin A = b ÷ sin B = c ÷ sin C
+Cosine rule? :: a² = b² + c² − 2bc cos A
+Area of a triangle using sine? :: ½ab sin C
+The quadratic formula? :: x = (−b ± √(b² − 4ac)) ÷ 2a
+Equation of a straight line? :: y = mx + c (m = gradient, c = y-intercept)
+Gradient between two points? :: (y₂ − y₁) ÷ (x₂ − x₁)
+Compound interest formula? :: Final amount = P(1 + r/100)ⁿ
+Arc length? :: (θ ÷ 360) × 2πr
+Area of a sector? :: (θ ÷ 360) × πr²

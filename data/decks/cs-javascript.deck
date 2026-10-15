@@ -1,0 +1,29 @@
+title: JavaScript Basics
+subject: Computer Science
+level: Beginner
+emoji: 🟨
+description: Variables, functions, arrays and the DOM in a nutshell.
+---
+How do you declare a block-scoped variable that can be reassigned? :: let x = 1;
+How do you declare a constant? :: const x = 1;
+What is the difference between == and ===? :: == compares after type coercion; === compares value and type (strict).
+What does typeof null return? :: "object" (a long-standing quirk).
+How do you write an arrow function that doubles n? :: const double = n => n * 2;
+What does Array.prototype.map do? :: Returns a new array with the result of calling a function on each element.
+What does Array.prototype.filter do? :: Returns a new array of elements that pass a test.
+What does Array.prototype.reduce do? :: Reduces an array to a single value using an accumulator function.
+How do you convert a string to an integer? :: parseInt('42', 10) or Number('42')
+What is a closure? :: A function that remembers variables from its outer scope even after that scope has finished.
+What does JSON.stringify do? :: Converts a JavaScript value into a JSON string.
+What does JSON.parse do? :: Converts a JSON string into a JavaScript value.
+How do you select an element by id in the DOM? :: document.getElementById('id')
+How do you select the first element matching a CSS selector? :: document.querySelector('.class')
+How do you listen for a click? :: element.addEventListener('click', handler)
+What is a Promise? :: An object representing the eventual completion or failure of an asynchronous operation.
+What does async/await do? :: Lets you write asynchronous code that reads like synchronous code.
+What does fetch() return? :: A Promise that resolves to a Response object.
+What is the value of [] + []? :: An empty string ''.
+What is NaN? :: 'Not a Number' – the result of an invalid numeric operation; typeof NaN is 'number'.
+What is hoisting? :: Declarations are moved to the top of their scope during compilation (let/const stay in the temporal dead zone).
+What does the spread operator ... do? :: Expands an iterable into individual elements, e.g. [...a, ...b].
+What is localStorage? :: A browser API for storing key/value strings that persist across sessions.

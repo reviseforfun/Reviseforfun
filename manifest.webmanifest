@@ -1,0 +1,13 @@
+{
+  "name": "ReviseForFun",
+  "short_name": "ReviseForFun",
+  "description": "Flashcards, spaced repetition, quizzes and games to make revision fun.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f8f9fc",
+  "theme_color": "#6c5ce7",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

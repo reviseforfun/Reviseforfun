@@ -1,0 +1,30 @@
+title: Electricity & Magnetism
+subject: Physics
+level: GCSE
+emoji: 🔌
+description: Circuits, current, resistance, mains electricity and magnets.
+---
+Charge flow formula? :: Charge = current × time (Q = It)
+What is the unit of current? :: Ampere (A).
+What is the unit of potential difference? :: Volt (V).
+What is the unit of resistance? :: Ohm (Ω).
+Ohm's law? :: Potential difference = current × resistance (V = IR)
+Electrical power formulae? :: P = IV and P = I²R
+Energy transferred formula for electrical appliances? :: E = P × t (or E = QV)
+How are ammeters connected in a circuit? :: In series.
+How are voltmeters connected? :: In parallel across the component.
+In a series circuit, how does current behave? :: It is the same at all points.
+In a parallel circuit, how does potential difference behave? :: It is the same across each branch.
+Total resistance of resistors in series? :: The sum of each resistance.
+What happens to the resistance of a thermistor as temperature rises? :: It decreases.
+What happens to the resistance of an LDR as light increases? :: It decreases.
+What does a diode do? :: Allows current in one direction only.
+Which wire in a UK plug is the live wire? :: Brown.
+Which wire in a UK plug is the neutral wire? :: Blue.
+Which wire in a UK plug is the earth wire? :: Green and yellow stripes.
+What is the UK mains voltage and frequency? :: 230 V and 50 Hz.
+What does a fuse do? :: Melts if the current is too high, breaking the circuit.
+What do like poles of magnets do? :: Repel (opposite poles attract).
+What is the right-hand rule used for? :: Finding the direction of the magnetic field around a current-carrying wire.
+What is a transformer's purpose? :: Changes the voltage of an alternating current (step-up or step-down).
+Why is electricity transmitted at high voltage? :: To reduce current and so reduce energy lost as heat in the cables.
