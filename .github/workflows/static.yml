@@ -1,12 +1,21 @@
 name: Deploy
+
+# Publishes the static app (no backend) to GitHub Pages. The site works fully
+# offline-first; accounts/sync/sharing light up when a backend URL is configured.
 on:
   push:
     branches: ["main"]
   workflow_dispatch:
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   deploy:
     environment:
@@ -15,9 +24,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify tests and bundled library
+        run: |
+          npm run check
+          npm test
+      - name: Assemble site
+        run: |
+          mkdir -p _site/data
+          cp -r index.html manifest.webmanifest sw.js css js icons .nojekyll _site/
+          cp data/library.json _site/data/
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: 'reviseforfun'
+          path: '_site'
       - id: deployment
         uses: actions/deploy-pages@v4

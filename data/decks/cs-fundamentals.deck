@@ -1,0 +1,30 @@
+title: Computer Science Fundamentals
+subject: Computer Science
+level: GCSE
+emoji: 💻
+description: Hardware, binary, networks, security and algorithms.
+---
+What does CPU stand for and what does it do? :: Central Processing Unit – fetches, decodes and executes instructions.
+What are the three stages of the fetch–decode–execute cycle? :: Fetch an instruction from memory, decode it, then execute it.
+What does RAM do? :: Volatile main memory that temporarily stores data and programs currently in use.
+What does ROM do? :: Non-volatile memory that stores the boot-up instructions (BIOS).
+What is the difference between volatile and non-volatile memory? :: Volatile memory loses its contents when power is off; non-volatile keeps them.
+What is the ALU? :: The Arithmetic Logic Unit – performs calculations and logical comparisons.
+What is cache memory? :: Very fast memory inside or near the CPU that stores frequently used data.
+How many bits are in a byte? :: 8
+How many bytes are in a kilobyte, megabyte, gigabyte? :: 1 KB = 1000 B, 1 MB = 1000 KB, 1 GB = 1000 MB (decimal, as in GCSE).
+Convert binary 1010 to denary. :: 10
+Convert denary 13 to binary. :: 1101
+What is hexadecimal used for? :: A compact way to represent binary (e.g. colour codes, memory addresses).
+What is ASCII? :: A character set that represents text characters using 7-bit binary codes.
+What is a pixel? :: The smallest individual point of an image.
+What is lossy compression? :: Reduces file size by permanently removing some data (e.g. JPEG, MP3).
+What is a LAN vs a WAN? :: LAN covers a small area (e.g. a school); WAN covers a large geographical area (e.g. the Internet).
+What does an IP address identify? :: A device on a network.
+What is phishing? :: Fraudulent emails or messages that trick people into revealing sensitive data.
+What is a firewall? :: Software or hardware that monitors and blocks unauthorised network traffic.
+What is an algorithm? :: A step-by-step set of instructions to solve a problem.
+How does a binary search work? :: Repeatedly halves a sorted list by checking the middle item.
+How does a bubble sort work? :: Repeatedly compares adjacent items and swaps them if out of order.
+What are the three basic programming constructs? :: Sequence, selection and iteration.
+What is the difference between a compiler and an interpreter? :: A compiler translates all the code at once; an interpreter translates and runs it line by line.

@@ -1,0 +1,30 @@
+title: Algebra & Number
+subject: Maths
+level: GCSE
+emoji: ➗
+description: Indices, surds, percentages, ratio, sequences and standard form.
+---
+a^m × a^n = ? :: a^(m+n)
+a^m ÷ a^n = ? :: a^(m−n)
+(a^m)^n = ? :: a^(mn)
+a⁰ = ? :: 1
+a^(−n) = ? :: 1 ÷ aⁿ
+a^(1/2) = ? :: √a
+a^(1/n) = ? :: The nth root of a.
+√a × √b = ? :: √(ab)
+Expand and simplify (x + 3)(x + 5). :: x² + 8x + 15
+Factorise x² − 9. :: (x − 3)(x + 3) – difference of two squares.
+Factorise x² + 5x + 6. :: (x + 2)(x + 3)
+Complete the square: x² + 6x + 1. :: (x + 3)² − 8
+What is the nth term of 3, 7, 11, 15, …? :: 4n − 1
+What is the Fibonacci sequence? :: Each term is the sum of the previous two: 1, 1, 2, 3, 5, 8, …
+Percentage change formula? :: (change ÷ original) × 100
+How do you increase £60 by 20%? :: Multiply by 1.2 → £72.
+Reverse percentage: price after 20% rise is £60. Original? :: £60 ÷ 1.2 = £50.
+Write 4 500 000 in standard form. :: 4.5 × 10⁶
+What is the HCF of 12 and 18? :: 6
+What is the LCM of 4 and 6? :: 12
+What are the first 10 prime numbers? :: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29
+What are the square numbers up to 15²? :: 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225
+What are the cube numbers up to 10³? :: 1, 8, 27, 64, 125, 216, 343, 512, 729, 1000
+Mean, median, mode, range? :: Mean = total ÷ count; median = middle value; mode = most common; range = largest − smallest.

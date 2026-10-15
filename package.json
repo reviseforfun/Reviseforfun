@@ -1,0 +1,15 @@
+{
+  "name": "reviseforfun",
+  "version": "2.0.0",
+  "description": "Make studying actually fun – flashcards, spaced repetition, quizzes, games, notes and a tiny sync backend.",
+  "private": true,
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "PORT=3000 node --watch server/index.js",
+    "build": "node scripts/build-library.js",
+    "check": "node scripts/build-library.js --check",
+    "test": "node --test"
+  }
+}
