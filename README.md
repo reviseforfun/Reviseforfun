@@ -17,13 +17,13 @@
 
 1. Fork this repository
 2. Go to **Settings → Pages**
-3. Under **Source**, select **main** branch
-4. Your site will be live at `https://yourusername.github.io/reviseforfun/`
+3. The included GitHub Actions workflow deploys the site when changes are pushed to `main` (or run it manually from the Actions tab).
+4. Configure GitHub Pages to use **GitHub Actions** as the build and deployment source.
 
 ## 🛠️ Tech Stack
 
 - Pure HTML5, CSS3, JavaScript (ES6+)
-- No frameworks or dependencies
+- No frameworks or dependencies; serve the repository root as a static site
 - CSS Custom Properties for theming
 - LocalStorage for data persistence
 

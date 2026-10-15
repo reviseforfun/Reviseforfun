@@ -45,7 +45,9 @@ let pomodoroState = {
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
     initTheme();
+    syncPomodoroSettingsInputs();
     updateStreak();
+    updateHomeStats();
     updateAllStats();
     initHeatmap();
 
@@ -68,14 +70,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ==================== DATA PERSISTENCE ====================
 function loadData() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-        try {
-            const parsed = JSON.parse(saved);
-            appData = { ...appData, ...parsed };
-        } catch (e) {
-            console.error('Failed to load data:', e);
-        }
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const parsed = JSON.parse(saved);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return;
+
+        appData = { ...appData, ...parsed };
+        // Migrate data created by the earlier, smaller version of the app.
+        appData.flashcards = Array.isArray(appData.flashcards) ? appData.flashcards : [];
+        appData.flashcards = appData.flashcards.filter(card => card && typeof card === 'object').map(card => ({
+            ...card,
+            id: card.id || generateId(),
+            subject: typeof card.subject === 'string' ? card.subject : 'General',
+            front: typeof card.front === 'string' ? card.front : '',
+            back: typeof card.back === 'string' ? card.back : ''
+        }));
+        appData.notes = Array.isArray(appData.notes) ? appData.notes : [];
+        appData.notes = appData.notes.filter(note => note && typeof note === 'object').map(note => ({
+            ...note,
+            id: note.id || generateId(),
+            title: typeof note.title === 'string' ? note.title : '',
+            content: typeof note.content === 'string' ? note.content : '',
+            subject: typeof note.subject === 'string' ? note.subject : '',
+            updatedAt: Number(note.updatedAt || note.createdAt) || Date.now()
+        }));
+        appData.quizHistory = Array.isArray(appData.quizHistory) ? appData.quizHistory : [];
+        appData.activityLog = appData.activityLog && typeof appData.activityLog === 'object' ? appData.activityLog : {};
+        appData.pomodoroSettings = { ...{
+            work: 25, short: 5, long: 15, autoStart: true, sound: true
+        }, ...(appData.pomodoroSettings || {}) };
+    } catch (e) {
+        console.error('Failed to load saved data:', e);
+        appData = { ...appData };
     }
 }
 
@@ -84,7 +111,16 @@ function saveData() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
     } catch (e) {
         console.error('Failed to save data:', e);
+        if (typeof showToast === 'function') showToast('Could not save data. Check your browser storage settings.', 'error');
     }
+}
+
+function syncPomodoroSettingsInputs() {
+    document.getElementById('pomo-work-duration').value = appData.pomodoroSettings.work;
+    document.getElementById('pomo-short-duration').value = appData.pomodoroSettings.short;
+    document.getElementById('pomo-long-duration').value = appData.pomodoroSettings.long;
+    document.getElementById('pomo-auto-start').checked = appData.pomodoroSettings.autoStart;
+    document.getElementById('pomo-sound').checked = appData.pomodoroSettings.sound;
 }
 
 // ==================== THEME ====================
@@ -213,14 +249,14 @@ function updateSubjectFilters() {
     const subjects = getSubjects();
     filter.innerHTML = '<option value="all">All Subjects</option>';
     subjects.forEach(s => {
-        filter.innerHTML += `<option value="${s}">${s}</option>`;
+        filter.innerHTML += `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`;
     });
 
     // Update datalist for card modal
     const datalist = document.getElementById('subject-suggestions');
     datalist.innerHTML = '';
     subjects.forEach(s => {
-        datalist.innerHTML += `<option value="${s}">`;
+        datalist.innerHTML += `<option value="${escapeHtml(s)}">`;
     });
 }
 
@@ -436,7 +472,7 @@ function updateQuizSetup() {
     const subjects = getSubjects();
     select.innerHTML = '<option value="all">All Subjects</option>';
     subjects.forEach(s => {
-        select.innerHTML += `<option value="${s}">${s}</option>`;
+        select.innerHTML += `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`;
     });
 
     const requirement = document.getElementById('quiz-requirement');
@@ -661,7 +697,6 @@ function resetQuiz() {
 // ==================== NOTES ====================
 function renderNotesList() {
     const list = document.getElementById('notes-list');
-    const empty = document.getElementById('notes-empty');
     const search = document.getElementById('notes-search').value.toLowerCase();
 
     let notes = appData.notes;
@@ -776,7 +811,7 @@ function updateNoteSubjects() {
     const currentVal = select.value;
     select.innerHTML = '<option value="">No Subject</option>';
     subjects.forEach(s => {
-        select.innerHTML += `<option value="${s}">${s}</option>`;
+        select.innerHTML += `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`;
     });
     select.value = currentVal;
 }
