@@ -11,8 +11,17 @@
 
     const DAY = 86400000;
     const DATA_VERSION = 2;
+    const DATE_KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
+    const LETTER_RE = /[\p{L}\p{N}]/u; // "word" characters – punctuation is kept
 
     // ---------- Dates ----------
+    /** 'YYYY-MM-DD' -> local midnight timestamp (NaN when the key is invalid). */
+    function keyToTime(key) {
+        if (typeof key !== 'string' || !DATE_KEY_RE.test(key)) return NaN;
+        const [y, m, d] = key.split('-').map(Number);
+        return new Date(y, m - 1, d).getTime();
+    }
+
     /** Local calendar day as YYYY-MM-DD. */
     function dateKey(d = new Date()) {
         const dt = d instanceof Date ? d : new Date(d);
@@ -43,6 +52,9 @@
             achievements: {}, // id -> unlocked timestamp
             activityLog: {}, // date -> activity count
             reviewLog: {}, // date -> cards reviewed
+            exams: {}, // subject -> 'YYYY-MM-DD'
+            freezesEarned: 0, // streak freezes banked over time
+            freezesUsed: 0, // streak freezes spent
             pomodoroSessions: 0,
             totalStudyMinutes: 0,
             streak: 0,
@@ -116,16 +128,178 @@
         return { level, xp: safe, base, next, progress: (safe - base) / (next - base) };
     }
 
-    // ---------- Streaks ----------
-    /** Mutates data: updates streak/lastActiveDate for the given day. */
+    // ---------- Streaks & streak freezes ----------
+    const FREEZE_EVERY = 7; // earn a freeze every 7-day streak
+    const FREEZE_BANK = 2; // never bank more than two
+
+    /** How many streak freezes are in the bank right now. */
+    function freezesAvailable(data) {
+        const earned = Math.max(0, Math.floor((data && data.freezesEarned) || 0));
+        const used = Math.max(0, Math.floor((data && data.freezesUsed) || 0));
+        return Math.min(FREEZE_BANK, Math.max(0, earned - used));
+    }
+
+    /**
+     * Is the streak still alive? Yesterday/today counts as alive, and one
+     * missed day is survivable when a freeze is banked.
+     */
+    function streakAlive(data, today = dateKey()) {
+        const last = data && data.lastActiveDate;
+        if (!last || !DATE_KEY_RE.test(last) || !(data.streak > 0)) return false;
+        const gap = dayDiff(last, today);
+        if (gap <= 1) return true;
+        if (gap === 2) return freezesAvailable(data) > 0;
+        return false;
+    }
+
+    /**
+     * Mutates data: updates streak/lastActiveDate for the given day.
+     * A banked freeze is spent automatically to bridge a single missed day,
+     * and every 7-day streak (only when the streak actually grew) banks a new
+     * freeze – up to FREEZE_BANK at a time.
+     */
     function touchStreak(data, today = dateKey()) {
+        data.freezesEarned = Math.max(0, Math.floor(data.freezesEarned || 0));
+        data.freezesUsed = Math.max(0, Math.floor(data.freezesUsed || 0));
         const last = data.lastActiveDate;
         if (last === today) return data;
-        if (last && dayDiff(last, today) === 1) data.streak = (data.streak || 0) + 1;
-        else data.streak = 1;
+        const gap = last && DATE_KEY_RE.test(last) ? dayDiff(last, today) : Infinity;
+        if (gap <= 0) { // clock moved backwards – never punish the student
+            data.lastActiveDate = today;
+            return data;
+        }
+
+        let grew = false;
+        let froze = false;
+        if (gap === 1) {
+            data.streak = (data.streak || 0) + 1;
+            grew = true;
+        } else if (gap === 2 && freezesAvailable(data) > 0) {
+            data.freezesUsed += 1; // the freeze bridges yesterday
+            data.streak = (data.streak || 0) + 1;
+            grew = true;
+            froze = true;
+        } else {
+            data.streak = 1;
+        }
         data.lastActiveDate = today;
+        if (grew && data.streak % FREEZE_EVERY === 0 && freezesAvailable(data) < FREEZE_BANK) {
+            data.freezesEarned += 1;
+        }
         data.bestStreak = Math.max(data.bestStreak || 0, data.streak);
         return data;
+    }
+
+    // ---------- Revision planner (retrievability, exams, workload) ----------
+    /**
+     * Probability you would still recall `card` at time `at`, using the classic
+     * forgetting curve: R = 0.9 ^ (days since review / interval).
+     * Cards that have never been reviewed have no memory to lose -> 0.
+     */
+    function retrievability(card, at = Date.now()) {
+        if (!card || !card.lastReview) return 0;
+        const interval = Math.max(Number(card.interval) || 0, 0.25);
+        const elapsedDays = Math.max(0, (at - card.lastReview) / DAY);
+        return Math.pow(0.9, elapsedDays / interval);
+    }
+
+    /** Mean retrievability of a set of cards (0..1). Unseen cards count as 0. */
+    function readiness(cards, now = Date.now()) {
+        const list = Array.isArray(cards) ? cards : [];
+        if (!list.length) return 0;
+        let sum = 0;
+        for (const c of list) sum += retrievability(c, now);
+        return sum / list.length;
+    }
+
+    /**
+     * Everything the Plan page needs about one exam.
+     * `newPerDay` leaves a 3-day review buffer, but only when there is more
+     * than a week to go (cramming the last three days helps nobody).
+     */
+    function examPlan(cards, examKey, today = dateKey(), now = Date.now()) {
+        const list = Array.isArray(cards) ? cards : [];
+        const examTime = keyToTime(examKey);
+        const hasExam = Number.isFinite(examTime);
+        const daysLeft = hasExam ? dayDiff(today, examKey) : null;
+        const unseen = list.filter((c) => c && !c.lastReview).length;
+        const buffer = daysLeft !== null && daysLeft > 7 ? 3 : 0;
+        const learnDays = Math.max(1, (daysLeft === null ? 1 : daysLeft) - buffer);
+        return {
+            daysLeft,
+            total: list.length,
+            unseen,
+            readinessNow: readiness(list, now),
+            readinessAtExam: hasExam ? readiness(list, examTime) : readiness(list, now),
+            newPerDay: Math.ceil(unseen / learnDays),
+        };
+    }
+
+    /**
+     * Review workload for the next `days` days.
+     * Index 0 = everything overdue plus what falls due today.
+     */
+    function dueForecast(cards, days = 14, today = dateKey()) {
+        const n = Math.max(1, Math.floor(days) || 14);
+        const out = new Array(n).fill(0);
+        for (const c of cards || []) {
+            const due = Number(c && c.due) || 0;
+            if (!due) continue; // brand-new cards are not review work
+            const idx = dayDiff(today, dateKey(new Date(due)));
+            if (idx <= 0) out[0] += 1;
+            else if (idx < n) out[idx] += 1;
+        }
+        return out;
+    }
+
+    /**
+     * The cards that hurt the most: reviewed cards that have been forgotten
+     * (lapses) or have a low ease. Scored so the worst float to the top.
+     * Returns copies with `weakScore` attached – appData is never mutated.
+     */
+    function weakCards(cards, limit = 10) {
+        const scored = [];
+        for (const c of cards || []) {
+            if (!c || !c.lastReview) continue;
+            const lapses = Number(c.lapses) || 0;
+            const ease = Number(c.ease) || 2.5;
+            if (lapses <= 0 && ease >= 2.1) continue;
+            scored.push({ ...c, weakScore: lapses * 3 + Math.max(0, 2.5 - ease) * 4 });
+        }
+        scored.sort((a, b) => b.weakScore - a.weakScore || (a.due || 0) - (b.due || 0));
+        return scored.slice(0, Math.max(0, Number(limit) || 0));
+    }
+
+    /**
+     * Progressive hint for an answer. Level 1 reveals the first letter of every
+     * word, level 2 reveals the first half of the letters. Punctuation and
+     * spacing are always kept so the shape of the answer stays readable.
+     */
+    function hint(answer, level = 1) {
+        const text = String(answer == null ? '' : answer);
+        const lv = Math.max(0, Math.min(2, Math.floor(Number(level) || 0)));
+        if (!lv) return '';
+        return text.replace(/\S+/g, (word) => {
+            const chars = [...word];
+            const letters = chars.filter((ch) => LETTER_RE.test(ch)).length;
+            const reveal = lv === 1 ? 1 : Math.ceil(letters / 2);
+            let seen = 0;
+            return chars.map((ch) => {
+                if (!LETTER_RE.test(ch)) return ch; // keep punctuation
+                seen += 1;
+                return seen <= reveal ? ch : '_';
+            }).join('');
+        });
+    }
+
+    /** The cards you are closest to forgetting – first stop for a boost session. */
+    function lowestRetrievability(cards, limit = 30, now = Date.now()) {
+        const reviewed = (Array.isArray(cards) ? cards : []).filter((c) => c && c.lastReview);
+        return reviewed
+            .map((c) => ({ card: c, r: retrievability(c, now) }))
+            .sort((a, b) => a.r - b.r || (a.card.due || 0) - (b.card.due || 0))
+            .slice(0, Math.max(0, Number(limit) || 0))
+            .map((x) => x.card);
     }
 
     // ---------- Achievements ----------
@@ -342,6 +516,10 @@
             })(),
             activityLog: maxMap(a.activityLog, b.activityLog),
             reviewLog: maxMap(a.reviewLog, b.reviewLog),
+            // Exam dates come from the newer document: clearing a date must stick.
+            exams: { ...(newer.exams && typeof newer.exams === 'object' ? newer.exams : {}) },
+            freezesEarned: Math.max(a.freezesEarned || 0, b.freezesEarned || 0),
+            freezesUsed: Math.max(a.freezesUsed || 0, b.freezesUsed || 0),
             pomodoroSessions: Math.max(a.pomodoroSessions, b.pomodoroSessions),
             totalStudyMinutes: Math.max(a.totalStudyMinutes, b.totalStudyMinutes),
             bestStreak: Math.max(a.bestStreak || 0, b.bestStreak || 0),
@@ -360,9 +538,10 @@
     }
 
     return {
-        DAY, DATA_VERSION, GRADES, ACHIEVEMENTS,
-        dateKey, dayDiff, defaultData, newSrs, schedule, isDue, cardStatus,
-        levelInfo, touchStreak, checkAchievements,
+        DAY, DATA_VERSION, GRADES, ACHIEVEMENTS, FREEZE_EVERY, FREEZE_BANK,
+        dateKey, dayDiff, keyToTime, defaultData, newSrs, schedule, isDue, cardStatus,
+        levelInfo, touchStreak, freezesAvailable, streakAlive, checkAchievements,
+        retrievability, readiness, examPlan, dueForecast, weakCards, hint, lowestRetrievability,
         normalizeText, levenshtein, checkTypedAnswer, shuffle, pickDistractors,
         parseCsv, toCsv, cardsFromCsv, mergeData,
     };

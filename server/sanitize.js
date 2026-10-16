@@ -5,7 +5,7 @@
  */
 const { defaultData, DATA_VERSION } = require('../js/core');
 
-const LIMITS = { cards: 10000, notes: 1000, quizzes: 500, logDays: 800, decks: 200 };
+const LIMITS = { cards: 10000, notes: 1000, quizzes: 500, logDays: 800, decks: 200, exams: 100 };
 const ID_RE = /^[A-Za-z0-9_:.-]{1,64}$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const BAD_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
@@ -17,6 +17,8 @@ const num = (v, min = 0, max = 1e12, fallback = 0) => {
 };
 const arr = (v, max) => (Array.isArray(v) ? v.slice(0, max) : []);
 const validId = (id) => typeof id === 'string' && ID_RE.test(id) && !BAD_KEYS.has(id);
+// Subjects are free text ("Computer Science"), so they get a looser check than ids.
+const validKey = (k) => typeof k === 'string' && k.trim().length > 0 && k.length <= 60 && !BAD_KEYS.has(k);
 
 function numberMap(v, keyRe, max, maxLen = 1e9) {
     const out = {};
@@ -103,6 +105,17 @@ function sanitizeDoc(input) {
         })(),
         activityLog: numberMap(d.activityLog, DATE_RE, LIMITS.logDays, 1e6),
         reviewLog: numberMap(d.reviewLog, DATE_RE, LIMITS.logDays, 1e6),
+        exams: (() => {
+            const out = {};
+            if (d.exams && typeof d.exams === 'object' && !Array.isArray(d.exams)) {
+                for (const [k, v] of Object.entries(d.exams).slice(0, LIMITS.exams)) {
+                    if (validKey(k) && typeof v === 'string' && DATE_RE.test(v)) out[k.trim().slice(0, 60)] = v;
+                }
+            }
+            return out;
+        })(),
+        freezesEarned: num(d.freezesEarned, 0, 1e6),
+        freezesUsed: num(d.freezesUsed, 0, 1e6),
         pomodoroSessions: num(d.pomodoroSessions, 0, 1e6),
         totalStudyMinutes: num(d.totalStudyMinutes, 0, 1e7),
         streak: num(d.streak, 0, 100000),

@@ -82,18 +82,24 @@ const API = (() => {
         ping,
         setBase,
         isLoggedIn: () => Boolean(state.token && state.user),
-        register: async (username, password) => {
-            const r = await request('POST', 'api/auth/register', { username, password });
+        /** @returns {token, user, recoveryCode} – the recovery code is shown once. */
+        register: async (username, password, email) => {
+            const r = await request('POST', 'api/auth/register', { username, password, ...(email ? { email } : {}) });
             setSession(r.token, r.user);
-            return r.user;
+            return r;
         },
-        login: async (username, password) => {
-            const r = await request('POST', 'api/auth/login', { username, password });
+        /** `identifier` is a username or a verified email address. */
+        login: async (identifier, password) => {
+            const r = await request('POST', 'api/auth/login', { username: identifier, password });
             setSession(r.token, r.user);
-            return r.user;
+            return r;
         },
         logout: async () => {
             try { await request('POST', 'api/auth/logout', {}); } catch { /* ignore */ }
+            setSession('', null);
+        },
+        logoutAll: async () => {
+            try { await request('POST', 'api/auth/logout-all', {}); } catch { /* ignore */ }
             setSession('', null);
         },
         deleteAccount: async (password) => {
@@ -105,13 +111,42 @@ const API = (() => {
             setSession(state.token, r.user);
             return r.user;
         },
-        me: () => request('GET', 'api/auth/me'),
+        /** Pass email: null to remove the address. Always needs the password. */
+        setEmail: async (email, password) => {
+            const r = await request('PATCH', 'api/auth/me', { email, password });
+            setSession(state.token, r.user);
+            return r.user;
+        },
+        changePassword: async (oldPassword, newPassword) => request('POST', 'api/auth/password', { oldPassword, newPassword }),
+        newRecoveryCode: async (password) => request('POST', 'api/auth/recovery-code', { password }),
+        resendVerification: () => request('POST', 'api/auth/email/resend', {}),
+        verifyEmail: (token) => request('POST', 'api/auth/email/verify', { token }),
+        forgot: (identifier) => request('POST', 'api/auth/forgot', { identifier }),
+        reset: (token, newPassword) => request('POST', 'api/auth/reset', { token, newPassword }),
+        recover: async (username, recoveryCode, newPassword) => {
+            const r = await request('POST', 'api/auth/recover', { username, recoveryCode, newPassword });
+            setSession(r.token, r.user);
+            return r;
+        },
+        sessions: () => request('GET', 'api/auth/sessions'),
+        revokeSession: (id) => request('DELETE', `api/auth/sessions/${encodeURIComponent(id)}`),
+        me: async () => {
+            const r = await request('GET', 'api/auth/me');
+            if (r && r.user) setSession(state.token, r.user);
+            return r;
+        },
         sync: (data) => request('PUT', 'api/sync', { data }, { timeout: 20000 }),
         leaderboard: () => request('GET', 'api/leaderboard?limit=20'),
         createShare: (title, cards) => request('POST', 'api/share', { title, cards }),
         myShares: () => request('GET', 'api/share'),
         getShare: (code) => request('GET', `api/share/${encodeURIComponent(code)}`),
         deleteShare: (code) => request('DELETE', `api/share/${encodeURIComponent(code)}`),
+        // ---- friend challenges ----
+        createChallenge: (title, cards) => request('POST', 'api/challenges', { title, cards }),
+        myChallenges: () => request('GET', 'api/challenges'),
+        getChallenge: (code) => request('GET', `api/challenges/${encodeURIComponent(code)}`),
+        submitChallengeResult: (code, result) => request('POST', `api/challenges/${encodeURIComponent(code)}/results`, result),
+        deleteChallenge: (code) => request('DELETE', `api/challenges/${encodeURIComponent(code)}`),
         /** Preset library: static JSON first (works on GitHub Pages), API as fallback. */
         loadLibrary: async () => {
             try {

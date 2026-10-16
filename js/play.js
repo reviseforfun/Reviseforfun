@@ -39,6 +39,8 @@ function resetQuiz() {
     $('quiz-results').hidden = true;
     $('quiz-active').hidden = true;
     $('quiz-setup').hidden = false;
+    const banner = $('quiz-challenge-banner');
+    if (banner) { banner.hidden = true; banner.textContent = ''; }
     fillSubjectSelect($('quiz-subject'));
     const none = appData.flashcards.length === 0;
     $('start-quiz-btn').disabled = none;
@@ -61,18 +63,32 @@ actions['start-quiz'] = () => {
     beginQuiz({ questions, subject, mode, timePerQ });
 };
 
-function beginQuiz({ questions, subject, mode, timePerQ }) {
-    quizState = { questions, subject, mode, timePerQ, index: 0, score: 0, answers: [], timer: null, locked: false, running: true };
+/**
+ * `pool` is where wrong answers come from (a friend challenge uses its own
+ * cards) and `challenge` marks a run that scores on someone else's board
+ * instead of your own stats.
+ */
+function beginQuiz({ questions, subject, mode, timePerQ, pool, challenge }) {
+    quizState = {
+        questions, subject, mode, timePerQ, index: 0, score: 0, answers: [], timer: null,
+        locked: false, running: true, pool: pool || appData.flashcards, challenge: challenge || null,
+    };
     $('quiz-setup').hidden = true;
     $('quiz-results').hidden = true;
     $('quiz-active').hidden = false;
     $('quiz-total-num').textContent = questions.length;
+    const banner = $('quiz-challenge-banner');
+    if (banner) {
+        banner.hidden = !challenge;
+        if (challenge) banner.textContent = `⚔️ ${challenge.title} · by ${challenge.author} · 20s per question`;
+    }
     showQuizQuestion();
 }
 
 actions['retake-quiz'] = () => {
     const q = quizState;
     if (!q) return resetQuiz();
+    if (q.challenge) return startChallengeQuiz(q.challenge.payload, q.challenge);
     beginQuiz({ questions: Core.shuffle([...q.questions]), subject: q.subject, mode: q.mode, timePerQ: q.timePerQ });
 };
 
@@ -92,7 +108,7 @@ function showQuizQuestion() {
     if (q.mode === 'choice') {
         typed.hidden = true;
         options.hidden = false;
-        const choices = Core.shuffle([card.back, ...Core.pickDistractors(card, appData.flashcards, 3)]);
+        const choices = Core.shuffle([card.back, ...Core.pickDistractors(card, q.pool, 3)]);
         options.innerHTML = '';
         choices.forEach((text, i) => {
             const btn = document.createElement('button');
@@ -199,6 +215,8 @@ function finishQuiz() {
     const pct = Math.round((q.score / total) * 100);
     const now = Date.now();
 
+    if (q.challenge) return finishChallengeQuiz(q, total, pct);
+
     appData.quizHistory.push({
         id: generateId(), subject: q.subject === 'all' ? 'All Subjects' : q.subject, mode: q.mode,
         score: q.score, total, percentage: pct, date: now,
@@ -238,6 +256,74 @@ function finishQuiz() {
     if (pct >= 80 && total >= 5) confetti();
 }
 
+// ==================== FRIEND CHALLENGES ====================
+/**
+ * Runs a shared challenge as a multiple-choice quiz: 20 seconds a question,
+ * distractors taken from the challenge's own cards, no XP and no quiz history –
+ * it still counts towards your streak, and the result lands on the board.
+ */
+function startChallengeQuiz(payload, previous) {
+    const cards = (payload.cards || []).map((c, i) => ({ ...c, id: `ch${i}` }));
+    if (!cards.length) return showToast('That challenge has no cards.', 'error');
+    const challenge = {
+        code: payload.code, title: payload.title, author: payload.author || 'a friend',
+        startedAt: Date.now(), payload, previous,
+    };
+    showPage('quiz');
+    beginQuiz({
+        questions: Core.shuffle([...cards]), subject: 'Challenge', mode: 'choice',
+        timePerQ: 20, pool: cards, challenge,
+    });
+    return true;
+}
+
+function finishChallengeQuiz(q, total, pct) {
+    const timeMs = Date.now() - q.challenge.startedAt;
+    // Counts towards the streak, but not towards XP or your quiz history.
+    recordActivity(total);
+    commit();
+
+    $('quiz-active').hidden = true;
+    $('quiz-results').hidden = false;
+    $('results-score').textContent = q.score;
+    $('results-total').textContent = total;
+    $('results-percentage').textContent = pct + '%';
+    const [emoji, title] = pct === 100 ? ['🏆', 'Flawless!'] : pct >= 80 ? ['🎉', 'Excellent!'] : pct >= 60 ? ['👍', 'Good job!']
+        : pct >= 40 ? ['💪', 'Not bad!'] : ['📚', 'Worth another go'];
+    $('results-emoji').textContent = emoji;
+    $('results-title').textContent = title;
+    $('results-xp').textContent = `⚔️ ${q.challenge.title} · ${Math.round(timeMs / 1000)}s · submitting your score…`;
+    $('results-review').innerHTML = '<p class="empty-text">Sending your result…</p>';
+
+    const wrong = q.answers.filter((a) => a.status === 'wrong');
+    API.submitChallengeResult(q.challenge.code, { score: q.score, total, timeMs })
+        .then((r) => {
+            if (!quizState || quizState !== q) return; // the student moved on
+            $('results-xp').textContent = `⚔️ ${q.challenge.title} · ${Math.round(timeMs / 1000)}s · you are #${r.rank}${r.best && r.best.score > q.score ? ` (best ${r.best.score}/${total})` : ''}`;
+            $('results-review').innerHTML = challengeBoardHtml(r.results, API.state.user && API.state.user.username, total)
+                + (wrong.length ? `<h4>Review your mistakes</h4>${wrong.map((a) => `
+                    <div class="review-item">
+                        <div class="review-q">${esc(a.card.front)}</div>
+                        <div class="review-given">${a.timedOut ? '⏰ No answer' : `❌ ${esc(a.given || '—')}`}</div>
+                        <div class="review-correct">✅ ${esc(a.card.back)}</div>
+                    </div>`).join('')}` : '');
+            if (pct === 100) confetti();
+        })
+        .catch((e) => {
+            $('results-xp').textContent = `⚔️ ${q.challenge.title} · ${Math.round(timeMs / 1000)}s`;
+            $('results-review').innerHTML = `<p class="empty-text">Your score could not be submitted: ${esc(e.message)}</p>`;
+        });
+}
+
+function challengeBoardHtml(results, me, total) {
+    if (!results || !results.length) return '';
+    return `<h4>Leaderboard</h4><table class="lb-table"><thead><tr><th>#</th><th>Student</th><th>Score</th><th>Time</th></tr></thead><tbody>${
+        results.map((r) => `<tr class="${r.username === me ? 'lb-me' : ''}">
+            <td>${['🥇', '🥈', '🥉'][r.rank - 1] || r.rank}</td><td>${esc(r.username)}</td>
+            <td>${r.score}/${r.total || total}</td><td>${(r.timeMs / 1000).toFixed(1)}s</td></tr>`).join('')
+    }</tbody></table>`;
+}
+
 keyHandlers.push((e) => {
     const q = quizState;
     if (currentPage !== 'quiz' || !q || !q.running || $('quiz-active').hidden) return false;
@@ -260,6 +346,8 @@ leaveHooks.push((from, to) => {
     if (from === 'quiz' && to !== 'quiz' && quizState) {
         clearInterval(quizState.timer);
         quizState = null;
+        const banner = $('quiz-challenge-banner');
+        if (banner) banner.hidden = true;
     }
 });
 

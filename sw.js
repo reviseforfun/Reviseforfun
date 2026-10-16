@@ -1,7 +1,7 @@
 /* Network-first service worker: always fresh when online, works offline. */
-const CACHE = 'reviseforfun-v2';
+const CACHE = 'reviseforfun-v3';
 const SHELL = ['./', 'index.html', 'css/style.css', 'css/features.css', 'js/core.js', 'js/api.js', 'js/app.js',
-    'js/cards.js', 'js/play.js', 'js/tools.js', 'js/community.js', 'js/boot.js', 'data/library.json', 'icons/icon.svg'];
+    'js/cards.js', 'js/play.js', 'js/plan.js', 'js/tools.js', 'js/community.js', 'js/boot.js', 'data/library.json', 'icons/icon.svg'];
 
 self.addEventListener('install', (e) => {
     e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

@@ -1,7 +1,9 @@
 name: Deploy
 
 # Publishes the static app (no backend) to GitHub Pages. The site works fully
-# offline-first; accounts/sync/sharing light up when a backend URL is configured.
+# offline-first; accounts, cloud sync, deck sharing and friend challenges light
+# up when a backend URL is configured in Community -> Server settings (GitHub
+# Pages cannot run the Node/SQLite server itself).
 on:
   push:
     branches: ["main"]
