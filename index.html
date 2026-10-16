@@ -38,6 +38,7 @@
             </a>
             <div class="nav-links" id="nav-links">
                 <a href="#home" class="nav-link active" data-page="home">Home</a>
+                <a href="#plan" class="nav-link" data-page="plan">Plan</a>
                 <a href="#library" class="nav-link" data-page="library">Library</a>
                 <a href="#flashcards" class="nav-link" data-page="flashcards">Cards <span class="nav-badge" id="nav-due" hidden>0</span></a>
                 <a href="#quiz" class="nav-link" data-page="quiz">Quiz</a>
@@ -90,6 +91,8 @@
                 </div>
             </div>
 
+            <div class="exam-banner-wrap" id="exam-banner"></div>
+
             <div class="dashboard" id="dashboard"></div>
 
             <div class="features-section">
@@ -102,12 +105,41 @@
                 <h2 class="section-title">Everything you need to revise</h2>
                 <div class="features-grid">
                     <div class="feature-card" data-action="goto" data-arg="library"><div class="feature-icon">📦</div><h3>Deck Library</h3><p>31 curated decks across Biology, Chemistry, Physics, Maths, English, History, Geography, languages and more.</p></div>
+                    <div class="feature-card" data-action="goto" data-arg="plan"><div class="feature-icon">🗺️</div><h3>Exam Plan</h3><p>Set your exam dates and see your readiness today, your projected score on the day, and exactly how many new cards to learn each day.</p></div>
                     <div class="feature-card" data-action="goto" data-arg="flashcards"><div class="feature-icon">🧠</div><h3>Spaced Repetition</h3><p>Rate each card Again / Hard / Good / Easy and we schedule the next review right before you'd forget.</p></div>
                     <div class="feature-card" data-action="goto" data-arg="quiz"><div class="feature-icon">✅</div><h3>Smart Quizzes</h3><p>Multiple choice or type-your-answer quizzes with timers and a review of every mistake.</p></div>
                     <div class="feature-card" data-action="goto" data-arg="games"><div class="feature-icon">🎮</div><h3>Games</h3><p>Match Pairs and the 60-second Speed Round turn recall into a competition with yourself.</p></div>
                     <div class="feature-card" data-action="goto" data-arg="notes"><div class="feature-icon">📝</div><h3>Notes → Cards</h3><p>Write notes with Markdown, then turn any <code>question :: answer</code> line into a flashcard.</p></div>
                     <div class="feature-card" data-action="goto" data-arg="community"><div class="feature-icon">☁️</div><h3>Sync &amp; Share</h3><p>Optional free account to sync across devices, share decks with a code, and climb the leaderboard.</p></div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ==================== PLAN ==================== -->
+        <section id="page-plan" class="page">
+            <div class="page-header">
+                <div><h1>🗺️ Revision Plan</h1><p>How ready are you today – and how ready will you be on exam day?</p></div>
+                <div class="page-header-actions">
+                    <button class="btn btn-secondary" data-action="goto" data-arg="flashcards">🎴 Study due</button>
+                    <button class="btn btn-primary" data-action="boost-readiness">⚡ Boost readiness</button>
+                </div>
+            </div>
+            <div class="plan-top">
+                <div class="community-card plan-overall-card" id="plan-overall"></div>
+                <div class="community-card plan-freeze-card" id="plan-freeze"></div>
+            </div>
+            <div class="stats-section">
+                <h2>📚 Subjects &amp; exams</h2>
+                <p class="modal-hint">Set an exam date and we work out how many new cards a day you need, and what you will remember on the day if you stop revising now.</p>
+                <div class="plan-subjects" id="plan-subjects"></div>
+            </div>
+            <div class="stats-section">
+                <h2>📅 Review workload (next 14 days)</h2>
+                <div class="forecast" id="plan-forecast"></div>
+            </div>
+            <div class="stats-section">
+                <h2>🩹 Weak spots</h2>
+                <div id="plan-weak"></div>
             </div>
         </section>
 
@@ -170,6 +202,7 @@
                     <button class="btn btn-ghost btn-sm" data-action="exit-study">← Back</button>
                     <span class="study-label" id="study-label"></span>
                     <div class="study-tools">
+                        <button class="btn btn-ghost btn-sm" id="study-hint-btn" data-action="study-hint" title="Progressive hint (H) – using one locks “Easy”">💡 Hint</button>
                         <button class="btn btn-ghost btn-sm" id="study-reverse" data-action="study-reverse" title="Show the answer first">🔁 Reverse</button>
                         <button class="btn btn-ghost btn-sm" id="study-star" data-action="study-star" title="Star this card (S)">☆</button>
                     </div>
@@ -190,14 +223,16 @@
                         </div>
                     </div>
                 </div>
+                <div class="study-hint" id="study-hint" hidden></div>
                 <div class="study-controls" id="study-flip-row">
                     <button class="btn btn-primary btn-lg" data-action="flip">Show answer <kbd>Space</kbd></button>
+                    <button class="btn btn-secondary btn-lg" data-action="study-hint">💡 Hint <kbd>H</kbd></button>
                 </div>
                 <div class="study-controls rate-controls" id="study-rate-row" hidden>
                     <button class="btn rate-btn rate-again" data-action="rate" data-arg="1"><span>Again</span><small id="rate-int-1"></small><kbd>1</kbd></button>
                     <button class="btn rate-btn rate-hard" data-action="rate" data-arg="2"><span>Hard</span><small id="rate-int-2"></small><kbd>2</kbd></button>
                     <button class="btn rate-btn rate-good" data-action="rate" data-arg="3"><span>Good</span><small id="rate-int-3"></small><kbd>3</kbd></button>
-                    <button class="btn rate-btn rate-easy" data-action="rate" data-arg="4"><span>Easy</span><small id="rate-int-4"></small><kbd>4</kbd></button>
+                    <button class="btn rate-btn rate-easy" id="rate-easy" data-action="rate" data-arg="4" title="Rate Easy"><span>Easy</span><small id="rate-int-4"></small><kbd>4</kbd></button>
                 </div>
             </div>
 
@@ -254,6 +289,7 @@
                 </div>
             </div>
             <div id="quiz-active" class="quiz-active" hidden>
+                <div class="quiz-challenge-banner" id="quiz-challenge-banner" hidden></div>
                 <div class="quiz-header">
                     <div class="quiz-progress">Question <span id="quiz-question-num">1</span> of <span id="quiz-total-num">10</span></div>
                     <div class="quiz-timer" id="quiz-timer"><span id="quiz-timer-text">30s</span><div class="quiz-timer-bar"><div class="quiz-timer-fill" id="quiz-timer-fill"></div></div></div>
@@ -463,6 +499,7 @@
                     <div id="leaderboard"></div>
                 </div>
                 <div class="community-card" id="shares-card"></div>
+                <div class="community-card" id="challenge-card"></div>
             </div>
         </section>
     </main>
@@ -528,6 +565,22 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="challenge-modal" data-modal>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="challenge-title">
+            <div class="modal-header"><h2 id="challenge-title">Friend challenge</h2><button class="modal-close" data-action="close-modal" aria-label="Close">×</button></div>
+            <div class="modal-body" id="challenge-body"></div>
+            <div class="modal-footer" id="challenge-footer"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="info-modal" data-modal>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="info-modal-title">
+            <div class="modal-header"><h2 id="info-modal-title">Info</h2><button class="modal-close" data-action="close-modal" aria-label="Close">×</button></div>
+            <div class="modal-body" id="info-modal-body"></div>
+            <div class="modal-footer" id="info-modal-footer"></div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="deck-modal" data-modal>
         <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="deck-modal-title">
             <div class="modal-header"><h2 id="deck-modal-title">Deck</h2><button class="modal-close" data-action="close-modal" aria-label="Close">×</button></div>
@@ -542,7 +595,7 @@
         <div class="footer-content">
             <div class="footer-brand">📚 ReviseForFun</div>
             <p>100% Free &amp; Open Source • Made with ❤️ for students everywhere</p>
-            <div class="footer-links"><span>Shortcuts:</span> <span><kbd>Space</kbd> flip</span> • <span><kbd>1-4</kbd> rate</span> • <span><kbd>S</kbd> star</span> • <span><kbd>Esc</kbd> close</span></div>
+            <div class="footer-links"><span>Shortcuts:</span> <span><kbd>Space</kbd> flip</span> • <span><kbd>1-4</kbd> rate</span> • <span><kbd>H</kbd> hint</span> • <span><kbd>S</kbd> star</span> • <span><kbd>Esc</kbd> close</span></div>
         </div>
     </footer>
 
@@ -551,6 +604,7 @@
     <script src="js/app.js"></script>
     <script src="js/cards.js"></script>
     <script src="js/play.js"></script>
+    <script src="js/plan.js"></script>
     <script src="js/tools.js"></script>
     <script src="js/community.js"></script>
     <script src="js/boot.js"></script>

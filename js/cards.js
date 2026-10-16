@@ -8,6 +8,7 @@ let editingCardId = null;
 let previewDeckId = null;
 
 const XP_FOR_GRADE = { 1: 2, 2: 6, 3: 10, 4: 12 };
+const NEW_PER_SESSION = 20; // brand-new cards allowed in one "Study due" session
 
 function subjectColor(subject) {
     let h = 0;
@@ -404,11 +405,12 @@ function showStudyView(view) {
  */
 function startStudy(ids, { label = 'Study session', mode = 'all' } = {}) {
     const queue = [...new Set(ids)].filter(findCard);
-    if (!queue.length) return showToast('No cards to study!', 'error');
+    if (!queue.length) { showToast('No cards to study!', 'error'); return false; }
     if (mode === 'all') Core.shuffle(queue);
     study = {
         queue: queue.slice(0, 100), total: Math.min(queue.length, 100), done: 0,
         reviewed: 0, good: 0, xp: 0, flipped: false,
+        hint: 0, hinted: 0,
         label, startedAt: Date.now(), grades: { 1: 0, 2: 0, 3: 0, 4: 0 },
     };
     $('study-label').textContent = label;
@@ -442,8 +444,45 @@ function showStudyCard() {
     $('study-progress-text').textContent = `${study.done} / ${study.total}`;
     $('study-flip-row').hidden = false;
     $('study-rate-row').hidden = true;
+    study.hint = 0;
+    paintStudyHint(card);
     for (let g = 1; g <= 4; g++) $(`rate-int-${g}`).textContent = formatInterval(Core.schedule(card, g).interval);
 }
+
+/** The side the answer is on (study mode can be reversed). */
+function studyAnswer(card) {
+    return studyReverse ? card.front : card.back;
+}
+
+/** Shows the current hint and locks "Easy" as soon as one has been used. */
+function paintStudyHint(card) {
+    const box = $('study-hint');
+    const level = study ? study.hint : 0;
+    if (box) {
+        box.hidden = level === 0;
+        box.textContent = level ? `💡 ${Core.hint(studyAnswer(card || {}), level)}` : '';
+        box.dataset.level = String(level);
+    }
+    const easy = $('rate-easy');
+    if (easy) easy.disabled = level > 0;
+    const hintBtn = $('study-hint-btn');
+    if (hintBtn) {
+        hintBtn.disabled = level >= 2;
+        hintBtn.textContent = level === 0 ? '💡 Hint' : level === 1 ? '💡 More hint' : '💡 Hint used';
+    }
+}
+
+/** Progressive hints: first letters, then the first half of each word. */
+function useStudyHint() {
+    const card = currentStudyCard();
+    if (!study || !card || study.hint >= 2) return;
+    study.hint += 1;
+    if (study.hint === 1) study.hinted += 1;
+    paintStudyHint(card);
+    if (study.flipped) showToast('Hint used – "Easy" is off for this card.', 'info');
+}
+
+actions['study-hint'] = useStudyHint;
 
 function flipStudyCard(forwardOnly = false) {
     if (!study || !currentStudyCard()) return;
@@ -459,6 +498,8 @@ function flipStudyCard(forwardOnly = false) {
 function rateStudyCard(grade) {
     const card = currentStudyCard();
     if (!study || !card || !study.flipped) return;
+    // A hinted card was not recalled unaided, so "Easy" is not on offer.
+    if (grade === Core.GRADES.EASY && study.hint > 0) grade = Core.GRADES.GOOD;
     Object.assign(card, Core.schedule(card, grade), { updatedAt: Date.now() });
     const today = Core.dateKey();
     appData.reviewLog[today] = (appData.reviewLog[today] || 0) + 1;
@@ -489,6 +530,7 @@ function finishStudy() {
     $('summary-stats').innerHTML = `
         <div><strong>${s.reviewed}</strong><span>reviews</span></div>
         <div><strong>${accuracy}%</strong><span>recalled</span></div>
+        <div><strong>${s.hinted}</strong><span>hinted</span></div>
         <div><strong>+${s.xp}</strong><span>XP</span></div>
         <div><strong>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</strong><span>time</span></div>
         <div class="summary-wide"><span>Today: ${today}/${appData.dailyGoal} of your daily goal ${today >= appData.dailyGoal ? '✅' : ''}</span></div>`;
@@ -502,7 +544,15 @@ actions['study-due'] = () => {
     const due = dueCards(subject);
     const reviewed = due.filter((c) => c.lastReview).sort((a, b) => a.due - b.due);
     const fresh = Core.shuffle(due.filter((c) => !c.lastReview));
-    startStudy([...reviewed, ...fresh].map((c) => c.id), { label: `Due cards${subject !== 'all' ? ` · ${subject}` : ''}`, mode: 'due' });
+    // Learning 200 new cards in one sitting buries the reviews that matter.
+    const allowed = fresh.slice(0, NEW_PER_SESSION);
+    const heldBack = fresh.length - allowed.length;
+    const started = startStudy([...reviewed, ...allowed].map((c) => c.id),
+        { label: `Due cards${subject !== 'all' ? ` · ${subject}` : ''}`, mode: 'due' });
+    if (started === false) return;
+    if (heldBack > 0) {
+        showToast(`${heldBack} new card${heldBack === 1 ? '' : 's'} held back for your next session (max ${NEW_PER_SESSION} new at a time).`, 'info');
+    }
 };
 
 actions['study-all'] = () => {
@@ -555,6 +605,7 @@ keyHandlers.push((e) => {
         return true;
     }
     if (e.key === 's' || e.key === 'S') { actions['study-star'](); return true; }
+    if (e.key === 'h' || e.key === 'H') { useStudyHint(); return true; }
     if (e.key === 'Escape') { actions['exit-study'](); return true; }
     return false;
 });

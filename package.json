@@ -1,15 +1,15 @@
 {
   "name": "reviseforfun",
-  "version": "2.0.0",
-  "description": "Make studying actually fun – flashcards, spaced repetition, quizzes, games, notes and a tiny sync backend.",
+  "version": "3.0.0",
+  "description": "Make studying actually fun – flashcards, spaced repetition, an exam plan, quizzes, games, notes, friend challenges and a zero-dependency sync backend.",
   "private": true,
   "license": "MIT",
-  "engines": { "node": ">=18" },
+  "engines": { "node": ">=22.13" },
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "PORT=3000 node --watch server/index.js",
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "PORT=3000 node --disable-warning=ExperimentalWarning --watch server/index.js",
     "build": "node scripts/build-library.js",
     "check": "node scripts/build-library.js --check",
-    "test": "node --test"
+    "test": "node --disable-warning=ExperimentalWarning --test"
   }
 }

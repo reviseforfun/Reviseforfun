@@ -81,6 +81,11 @@ function showToast(message, type = 'info') {
 }
 
 function downloadFile(filename, text, type = 'text/plain') {
+    // Older/embedded browsers (and jsdom) have no object URLs – fail softly.
+    if (typeof URL.createObjectURL !== 'function' || typeof Blob !== 'function') {
+        showToast('This browser cannot download files – copy the text instead.', 'error');
+        return false;
+    }
     const url = URL.createObjectURL(new Blob([text], { type }));
     const a = document.createElement('a');
     a.href = url;
@@ -89,6 +94,7 @@ function downloadFile(filename, text, type = 'text/plain') {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return true;
 }
 
 // ==================== PERSISTENCE ====================
@@ -105,9 +111,14 @@ function migrate(raw) {
     const d = { ...base, ...(raw && typeof raw === 'object' ? raw : {}) };
     d.pomodoroSettings = { ...base.pomodoroSettings, ...(d.pomodoroSettings || {}) };
     for (const key of ['flashcards', 'notes', 'quizHistory', 'installedDecks']) if (!Array.isArray(d[key])) d[key] = [];
-    for (const key of ['deleted', 'achievements', 'activityLog', 'reviewLog']) {
+    for (const key of ['deleted', 'achievements', 'activityLog', 'reviewLog', 'exams']) {
         if (!d[key] || typeof d[key] !== 'object' || Array.isArray(d[key])) d[key] = {};
     }
+    for (const [subject, key] of Object.entries(d.exams)) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(String(key))) delete d.exams[subject];
+    }
+    d.freezesEarned = Math.max(0, Math.floor(Number(d.freezesEarned) || 0));
+    d.freezesUsed = Math.min(d.freezesEarned, Math.max(0, Math.floor(Number(d.freezesUsed) || 0)));
     const now = Date.now();
     d.flashcards = d.flashcards
         .filter((c) => c && c.front && c.back)
@@ -173,16 +184,30 @@ actions['toggle-theme'] = () => {
 };
 
 // ==================== NAVIGATION ====================
-const PAGES = ['home', 'library', 'flashcards', 'quiz', 'games', 'notes', 'pomodoro', 'stats', 'community'];
+const PAGES = ['home', 'plan', 'library', 'flashcards', 'quiz', 'games', 'notes', 'pomodoro', 'stats', 'community'];
 
-function pageFromHash() {
-    const p = location.hash.replace(/^#/, '');
+/** `#community?verify=abc` is still the community page – the query is a deep link. */
+function pageFromHash(hash = location.hash) {
+    const p = String(hash || '').replace(/^#/, '').split('?')[0];
     return PAGES.includes(p) ? p : 'home';
+}
+
+/** Query part of the current hash route, e.g. `#community?verify=TOKEN`. */
+function hashParams(hash = location.hash) {
+    const raw = String(hash || '').replace(/^#/, '');
+    const i = raw.indexOf('?');
+    return new URLSearchParams(i === -1 ? '' : raw.slice(i + 1));
+}
+
+/** Strip the deep-link token from the address bar (it must not be shareable/bookmarked). */
+function clearHashParams(page = pageFromHash()) {
+    if (!location.hash.includes('?')) return;
+    history.replaceState(null, '', `#${page}`);
 }
 
 function showPage(page) {
     if (!PAGES.includes(page)) page = 'home';
-    if (location.hash !== `#${page}`) history.pushState(null, '', `#${page}`); // no hashchange event
+    if (pageFromHash(location.hash) !== page || location.hash.includes('?')) history.pushState(null, '', `#${page}`); // no hashchange event
     renderPage(page);
 }
 
@@ -202,12 +227,16 @@ actions.goto = (page) => { closeModals(); showPage(page); };
 actions['toggle-menu'] = () => $('nav-links').classList.toggle('active');
 
 // ==================== GAMIFICATION ====================
-/** Streak display: a streak that wasn't continued yesterday or today is over. */
+/**
+ * Streak display: a streak that wasn't continued yesterday or today is over –
+ * unless a banked freeze can still bridge the missed day.
+ */
 function currentStreak() {
-    const last = appData.lastActiveDate;
-    if (!last) return 0;
-    const gap = Core.dayDiff(last, Core.dateKey());
-    return gap <= 1 ? appData.streak : 0;
+    return Core.streakAlive(appData) ? appData.streak : 0;
+}
+
+function freezesLeft() {
+    return Core.freezesAvailable(appData);
 }
 
 function award(xp) {
@@ -268,6 +297,7 @@ renderers.home = async () => {
     $('total-quizzes-stat').textContent = appData.quizHistory.length;
     $('total-time-stat').textContent = formatMinutes(appData.totalStudyMinutes);
     renderDashboard();
+    renderExamBanner();
     try {
         await ensureLibrary();
         const featured = FEATURED_DECKS.map((id) => library.find((d) => d.id === id)).filter(Boolean);
@@ -276,6 +306,44 @@ renderers.home = async () => {
         $('home-decks').innerHTML = '<p class="empty-text">Could not load the deck library.</p>';
     }
 };
+
+/** One line about the freezes in the bank. */
+function freezeText() {
+    const left = freezesLeft();
+    const next = Core.FREEZE_EVERY - (currentStreak() % Core.FREEZE_EVERY);
+    if (left === 0) return `❄️ No streak freezes banked – one every ${Core.FREEZE_EVERY}-day streak (max ${Core.FREEZE_BANK}).`;
+    return `❄️ ${left} streak freeze${left === 1 ? '' : 's'} banked${left < Core.FREEZE_BANK ? ` · next in ${next} days` : ' (bank full)'}`;
+}
+
+/** The soonest exam date set on the Plan page, or null. */
+function nextExam(today = Core.dateKey()) {
+    let best = null;
+    for (const [subject, key] of Object.entries(appData.exams || {})) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(String(key))) continue;
+        const days = Core.dayDiff(today, key);
+        if (days < 0) continue;
+        if (!best || days < best.days) best = { subject, date: key, days };
+    }
+    return best;
+}
+
+function renderExamBanner() {
+    const box = $('exam-banner');
+    if (!box) return;
+    const exam = nextExam();
+    if (!exam) { box.innerHTML = ''; return; }
+    const cards = appData.flashcards.filter((c) => c.subject === exam.subject);
+    const plan = Core.examPlan(cards, exam.date);
+    const pct = Math.round(plan.readinessAtExam * 100);
+    box.innerHTML = `<div class="exam-banner">
+        <div class="exam-banner-icon">🗓️</div>
+        <div class="exam-banner-text">
+            <strong>${esc(exam.subject)}</strong> exam in ${exam.days === 0 ? '<strong>today</strong>' : `${exam.days} day${exam.days === 1 ? '' : 's'}`}
+            <span class="dash-sub">${cards.length ? `Projected readiness on the day: <strong>${pct}%</strong>${plan.unseen ? ` · ${plan.unseen} cards unseen` : ''}` : 'No cards for this subject yet.'}</span>
+        </div>
+        <button class="btn btn-primary btn-sm" data-action="goto" data-arg="plan">Open plan →</button>
+    </div>`;
+}
 
 function renderDashboard() {
     const today = Core.dateKey();
@@ -321,6 +389,7 @@ function renderDashboard() {
             <div class="dash-grow">
                 <div class="dash-big">${currentStreak()}<small> day streak</small></div>
                 <div class="week-dots">${week.join('')}</div>
+                <div class="dash-sub" id="dash-freezes">${freezeText()}</div>
             </div>
         </div>`;
 }
@@ -521,7 +590,11 @@ document.addEventListener('keydown', (e) => {
 
 window.addEventListener('hashchange', () => {
     const page = pageFromHash();
-    if (page !== currentPage) renderPage(page);
+    if (page !== currentPage) return renderPage(page);
+    // Same page, but the query part carries a deep link (#community?verify=…)
+    if (page === 'community' && location.hash.includes('?') && typeof handleCommunityDeepLink === 'function') {
+        handleCommunityDeepLink();
+    }
 });
 
 // ==================== LIBRARY LOADING ====================
