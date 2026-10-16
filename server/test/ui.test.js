@@ -25,6 +25,34 @@ if (JSDOM) {
 
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+    /**
+     * Bridge the window's fetch to Node's. jsdom hands us objects from another
+     * realm, and undici brand-checks them: Node 24 rejects a jsdom AbortSignal
+     * outright ("member signal is not of type 'AbortSignal'") where Node 22 was
+     * permissive, so rebuild the whole init in the Node realm and rewire the
+     * signal to a native AbortController.
+     */
+    function bridgedFetch(window) {
+        return (input, init = {}) => {
+            const opts = { method: init.method || 'GET' };
+            if (init.headers) {
+                const headers = {};
+                const entries = typeof init.headers.entries === 'function'
+                    ? [...init.headers.entries()] : Object.entries(init.headers);
+                for (const [k, v] of entries) headers[k] = String(v);
+                opts.headers = headers;
+            }
+            if (init.body !== undefined && init.body !== null) opts.body = String(init.body);
+            if (init.signal) {
+                const ctrl = new AbortController();
+                if (init.signal.aborted) ctrl.abort();
+                else init.signal.addEventListener('abort', () => ctrl.abort(), { once: true });
+                opts.signal = ctrl.signal;
+            }
+            return fetch(new URL(String(input), window.location.href), opts);
+        };
+    }
+
     async function boot() {
         const app = createApp({ dbPath: ':memory:', silentMail: true, publicUrl: 'http://127.0.0.1' });
         const { server } = app;
@@ -39,7 +67,7 @@ if (JSDOM) {
             pretendToBeVisual: true,
             virtualConsole,
             beforeParse(window) {
-                window.fetch = (url, opts) => fetch(new URL(url, window.location.href), opts);
+                window.fetch = bridgedFetch(window);
                 window.scrollTo = () => {};
                 window.confirm = () => true;
                 window.prompt = () => 'correct horse';
@@ -61,7 +89,14 @@ if (JSDOM) {
             type: (sel, value) => { const el = $(sel); assert.ok(el, `missing ${sel}`); el.value = value; el.dispatchEvent(new window.Event('input', { bubbles: true })); el.dispatchEvent(new window.Event('change', { bubbles: true })); },
             key: (k) => { document.dispatchEvent(new window.KeyboardEvent('keydown', { key: k, bubbles: true })); },
             lastMail: () => app.mailer.last(),
-            close: async () => { window.close(); await new Promise((r) => server.close(r)); app.db.close(); },
+            close: async () => {
+                // Let in-flight app promises settle first: touching a closed
+                // window's document after the test ends fails the run.
+                await sleep(80);
+                window.close();
+                await new Promise((r) => server.close(r));
+                app.db.close();
+            },
         };
         try {
             if (document.readyState !== 'complete') await new Promise((r) => window.addEventListener('load', r));
