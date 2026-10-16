@@ -1,0 +1,8 @@
+name = "d1-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-16"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-d1-database"
+database_id = "d1441bee-3000-4876-bcdc-289c0a281013"
