@@ -5,9 +5,15 @@ on:
   push:
     branches-ignore: ["main"]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       matrix:
         node: [22, 24]
@@ -19,4 +25,25 @@ jobs:
       - run: npm run check
       - name: Install jsdom for the browser smoke test (not a project dependency)
         run: npm i --no-save --no-package-lock jsdom@26
-      - run: npm test
+      - name: Test
+        run: |
+          set -o pipefail
+          node --version
+          npm test 2>&1 | tee /tmp/test-output.txt
+      # TEMPORARY diagnostics: this sandbox cannot read Actions logs, so the raw
+      # output is posted back to the PR. Removed once the Node 24 job is green.
+      - name: Publish test output
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tail -c 60000 /tmp/test-output.txt > /tmp/body.txt
+          {
+            echo "<details><summary>node ${{ matrix.node }} test output</summary>"
+            echo
+            echo '```'
+            cat /tmp/body.txt
+            echo '```'
+            echo '</details>'
+          } > /tmp/comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --repo "$GITHUB_REPOSITORY" --body-file /tmp/comment.md || true
